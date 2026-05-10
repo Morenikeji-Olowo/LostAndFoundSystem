@@ -124,9 +124,9 @@
                     <p class="text-xs text-findr-muted mt-2"
                        th:text="${item.dateReported}">Date</p>
 
-                    <a href="/login"
-                       class="text-findr-primary text-sm font-semibold mt-2 block hover:underline">
-                        View Details →
+                    <a th:href="@{/item/{id}(id=${item.id})}"
+                       class="text-findr-primary hover:text-findr-primary/80 text-sm transition flex items-center gap-1">
+                        <i class="fas fa-eye"></i> View
                     </a>
                 </div>
 
