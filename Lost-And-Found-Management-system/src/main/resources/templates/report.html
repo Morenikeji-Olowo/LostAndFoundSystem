@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Findr - Report Item</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'findr-primary': '#0D5C4A',
+                        'findr-accent': '#F5A623',
+                        'findr-surface': '#F7F8F6',
+                        'findr-text': '#1A1A1A',
+                        'findr-muted': '#6B7280',
+                        'findr-border': '#E5E7EB',
+                    },
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif'],
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        'card': '12px',
+                        'btn': '8px',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-roboto text-findr-text bg-white">
+
+<!-- Navbar (same) -->
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <div class="mb-6">
+        <h1 class="font-poppins font-bold text-3xl text-findr-text">Report an Item</h1>
+        <p class="text-findr-muted mt-1">Help someone reunite with their belongings</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex gap-2 mb-6">
+        <button type="button" id="lostTab" class="report-tab flex-1 py-3 text-center font-semibold rounded-btn transition-all bg-findr-primary text-white">I Lost Something</button>
+        <button type="button" id="foundTab" class="report-tab flex-1 py-3 text-center font-semibold rounded-btn transition-all bg-gray-100 text-findr-muted hover:bg-gray-200">I Found Something</button>
+    </div>
+
+    <!-- Form -->
+    <form id="reportForm" action="/report" method="post" enctype="multipart/form-data" class="bg-white border border-findr-border rounded-card p-6 md:p-8 shadow-sm">
+        <input type="hidden" id="reportType" name="type" value="LOST"/>
+
+        <!-- Item Name -->
+        <div class="mb-5">
+            <label class="block text-gray-700 font-medium mb-2 text-sm">Item Name <span class="text-red-500">*</span></label>
+            <input type="text" id="itemName" name="name" class="w-full px-4 py-2.5 border border-gray-200 rounded-btn focus:outline-none focus:border-findr-accent transition">
+            <p id="nameError" class="text-red-500 text-xs mt-1 hidden">Item name is required</p>
+        </div>
+
+        <!-- Category -->
+        <div class="mb-5">
+            <label class="block text-gray-700 font-medium mb-2 text-sm">Category <span class="text-red-500">*</span></label>
+            <select id="category" name="category" class="w-full px-4 py-2.5 border border-gray-200 rounded-btn focus:outline-none focus:border-findr-accent transition bg-white">
+                <option value="">Select a category</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Bag">Bag</option>
+                <option value="ID Card">ID Card</option>
+                <option value="Keys">Keys</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Other">Other</option>
+            </select>
+            <p id="categoryError" class="text-red-500 text-xs mt-1 hidden">Please select a category</p>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-5">
+            <label class="block text-gray-700 font-medium mb-2 text-sm">Description <span class="text-red-500">*</span></label>
+            <textarea id="description" name="description" rows="4" placeholder="Describe the item in detail (color, brand, distinguishing marks, etc.)" class="w-full px-4 py-2.5 border border-gray-200 rounded-btn focus:outline-none focus:border-findr-accent transition"></textarea>
+            <p id="descError" class="text-red-500 text-xs mt-1 hidden">Description is required</p>
+        </div>
+
+        <!-- Date -->
+        <div class="mb-5">
+            <label class="block text-gray-700 font-medium mb-2 text-sm">Date <span class="text-red-500">*</span></label>
+            <input type="date" id="date" name="dateReported" class="w-full px-4 py-2.5 border border-gray-200 rounded-btn focus:outline-none focus:border-findr-accent transition">
+            <p id="dateError" class="text-red-500 text-xs mt-1 hidden">Date is required</p>
+        </div>
+
+        <!-- Location -->
+        <div class="mb-5">
+            <label class="block text-gray-700 font-medium mb-2 text-sm">Location <span class="text-red-500">*</span></label>
+            <input type="text" id="location" name="location" placeholder="e.g., Library, Student Union, Cafeteria" class="w-full px-4 py-2.5 border border-gray-200 rounded-btn focus:outline-none focus:border-findr-accent transition">
+            <p id="locationError" class="text-red-500 text-xs mt-1 hidden">Location is required</p>
+        </div>
+
+        <!-- Photo Upload -->
+        <div class="mb-6">
+            <label class="block text-gray-700 font-medium mb-2 text-sm">Upload Photo (Optional)</label>
+            <div class="border-2 border-dashed border-gray-200 rounded-card p-6 text-center hover:border-findr-accent transition cursor-pointer" id="dropZone">
+                <input type="file" id="photo" name="photo" accept="image/*" class="hidden">
+                <svg class="w-10 h-10 text-findr-muted mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <p class="text-sm text-findr-muted">Click or drag to upload an image</p>
+                <p id="fileName" class="text-xs text-findr-primary mt-2 hidden"></p>
+            </div>
+        </div>
+
+        <button type="submit" class="w-full bg-findr-accent hover:bg-amber-600 text-white font-semibold py-3 rounded-btn transition">Submit Report</button>
+    </form>
+</main>
+
+<script>
+    // Tab switching
+    const lostTab = document.getElementById('lostTab');
+    const foundTab = document.getElementById('foundTab');
+    const reportType = document.getElementById('reportType');
+
+    lostTab.addEventListener('click', () => {
+        lostTab.classList.add('bg-findr-primary', 'text-white');
+        lostTab.classList.remove('bg-gray-100', 'text-findr-muted');
+        foundTab.classList.add('bg-gray-100', 'text-findr-muted');
+        foundTab.classList.remove('bg-findr-primary', 'text-white');
+        reportType.value = 'LOST';
+    });
+
+    foundTab.addEventListener('click', () => {
+        foundTab.classList.add('bg-findr-primary', 'text-white');
+        foundTab.classList.remove('bg-gray-100', 'text-findr-muted');
+        lostTab.classList.add('bg-gray-100', 'text-findr-muted');
+        lostTab.classList.remove('bg-findr-primary', 'text-white');
+        reportType.value = 'FOUND';
+    });
+
+    // Validation
+    document.getElementById('reportForm').addEventListener('submit', (e) => {
+        let isValid = true;
+
+        const name = document.getElementById('itemName').value.trim();
+        const category = document.getElementById('category').value;
+        const description = document.getElementById('description').value.trim();
+        const date = document.getElementById('date').value;
+        const location = document.getElementById('location').value.trim();
+
+        if (!name) { document.getElementById('nameError').classList.remove('hidden'); isValid = false; }
+        else { document.getElementById('nameError').classList.add('hidden'); }
+
+        if (!category) { document.getElementById('categoryError').classList.remove('hidden'); isValid = false; }
+        else { document.getElementById('categoryError').classList.add('hidden'); }
+
+        if (!description) { document.getElementById('descError').classList.remove('hidden'); isValid = false; }
+        else { document.getElementById('descError').classList.add('hidden'); }
+
+        if (!date) { document.getElementById('dateError').classList.remove('hidden'); isValid = false; }
+        else { document.getElementById('dateError').classList.add('hidden'); }
+
+        if (!location) { document.getElementById('locationError').classList.remove('hidden'); isValid = false; }
+        else { document.getElementById('locationError').classList.add('hidden'); }
+
+        if (!isValid) e.preventDefault();
+    });
+
+    // File upload
+    const dropZone = document.getElementById('dropZone');
+    const photoInput = document.getElementById('photo');
+    const fileName = document.getElementById('fileName');
+
+    dropZone.addEventListener('click', () => photoInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-findr-accent'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-findr-accent'));
+    dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('border-findr-accent'); const file = e.dataTransfer.files[0]; if (file) { photoInput.files = e.dataTransfer.files; fileName.textContent = file.name; fileName.classList.remove('hidden'); } });
+    photoInput.addEventListener('change', () => { if (photoInput.files[0]) { fileName.textContent = photoInput.files[0].name; fileName.classList.remove('hidden'); } });
+</script>
+
+<footer class="bg-findr-surface border-t border-findr-border py-8 px-4 mt-12">
+    <div class="max-w-7xl mx-auto text-center text-findr-muted text-sm">
+        <p>&copy; 2024 Findr. All rights reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>

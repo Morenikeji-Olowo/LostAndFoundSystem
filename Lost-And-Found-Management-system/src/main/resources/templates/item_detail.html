@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${item.name} + ' - Findr'">Item Detail - Findr</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'findr-primary': '#0D5C4A',
+                        'findr-accent': '#F5A623',
+                        'findr-surface': '#F7F8F6',
+                        'findr-text': '#1A1A1A',
+                        'findr-muted': '#6B7280',
+                        'findr-border': '#E5E7EB',
+                    },
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif'],
+                        'roboto': ['Roboto', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        'card': '12px',
+                        'btn': '8px',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-roboto text-findr-text bg-white">
+
+<!-- Navbar (same as browse page) -->
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Back button -->
+    <a href="/browse" class="inline-flex items-center gap-2 text-findr-muted hover:text-findr-primary transition mb-6">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Back to Browse
+    </a>
+
+    <!-- Claimed Banner -->
+    <div th:if="${item.status == 'CLAIMED'}" class="bg-gray-100 border-l-4 border-gray-500 text-gray-700 p-4 rounded-md mb-6">
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="font-medium">This item has been claimed</span>
+        </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-white border border-findr-border rounded-card overflow-hidden shadow-sm">
+        <!-- Image Section -->
+        <!-- if item has a photo show it, otherwise show a placeholder -->
+        <img th:if="${item.photoPath != null}"
+             th:src="${item.photoPath}"
+             alt="Item photo"
+             class="w-full rounded-card object-cover"/>
+
+        <div th:if="${item.photoPath == null}"
+             class="w-full h-48 bg-gray-100 rounded-card flex items-center justify-center">
+            <p class="text-findr-muted">No photo available</p>
+        </div>
+
+        <!-- Content Section -->
+        <div class="p-6 md:p-8">
+            <!-- Header -->
+            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div>
+                    <h1 class="font-poppins font-bold text-2xl md:text-3xl text-findr-text" th:text="${item.name}">iPhone 14 Pro</h1>
+                    <div class="flex flex-wrap items-center gap-2 mt-2">
+                        <span class="text-xs font-semibold px-2 py-1 rounded-full" th:class="${item.category == 'Electronics' ? 'bg-blue-100 text-blue-700' : item.category == 'Bag' ? 'bg-amber-100 text-amber-700' : item.category == 'ID Card' ? 'bg-purple-100 text-purple-700' : item.category == 'Keys' ? 'bg-teal-100 text-teal-700' : item.category == 'Clothing' ? 'bg-pink-100 text-pink-700' : 'bg-gray-100 text-gray-700'}" th:text="${item.category}">Electronics</span>
+                        <span th:if="${item.type == 'LOST'}" class="text-xs font-semibold px-2 py-1 rounded-full bg-red-100 text-red-700">⚠️ Lost</span>
+                        <span th:if="${item.type == 'FOUND'}" class="text-xs font-semibold px-2 py-1 rounded-full bg-green-100 text-green-700">✓ Found</span>
+                        <span th:if="${item.status == 'OPEN'}" class="text-xs font-semibold px-2 py-1 rounded-full bg-amber-100 text-amber-700">Open</span>
+                        <span th:if="${item.status == 'CLAIMED'}" class="text-xs font-semibold px-2 py-1 rounded-full bg-gray-100 text-gray-700">Claimed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-6">
+                <h3 class="font-poppins font-semibold text-lg mb-2">Description</h3>
+                <p class="text-findr-text leading-relaxed" th:text="${item.description}">Found on 3rd floor near study carrels. iPhone 14 Pro in purple case.</p>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="grid md:grid-cols-2 gap-4 mb-6">
+                <div class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-findr-muted mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    <div>
+                        <p class="text-xs text-findr-muted">Location</p>
+                        <p class="font-medium" th:text="${item.location}">Library</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-findr-muted mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <div>
+                        <p class="text-xs text-findr-muted">Date Reported</p>
+                        <p class="font-medium" th:text="${item.dateReported}">2024-01-15</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-findr-muted mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    <div>
+                        <p class="text-xs text-findr-muted">Reported By</p>
+                        <p class="font-medium">Anonymous</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Claim Section -->
+            <div th:if="${item.type.name() == 'FOUND' and item.status.name() == 'OPEN'}" class="border-t border-findr-border pt-6 mt-4">
+                <div th:if="${!isLoggedIn}">
+                    <div class="bg-gray-50 rounded-card p-6 text-center">
+                        <p class="text-findr-muted mb-4">Want to claim this item?</p>
+                        <a class="inline-block bg-findr-accent hover:bg-amber-600 text-white font-semibold px-6 py-2.5 rounded-btn transition">Login to Submit a Claim</a>
+                    </div>
+                </div>
+                <div th:if="${isLoggedIn and !isOwner}">
+                    <button id="openClaimModal" class="w-full bg-findr-accent hover:bg-amber-600 text-white font-semibold py-3 rounded-btn transition">
+                        Submit a Claim
+                    </button>
+                </div>
+                <div th:if="${isLoggedIn and isOwner}">
+                    <div class="bg-gray-50 rounded-card p-6 text-center">
+                        <p class="text-findr-muted">You reported this item. You cannot claim your own report.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Claim Modal -->
+<div id="claimModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-card max-w-md w-full mx-4 p-6">
+        <h3 class="font-poppins font-bold text-xl mb-4">Submit a Claim</h3>
+        <form th:action="@{/claim/{itemId}(itemId=${item.id})}" method="post">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2 text-sm">Why do you believe this item is yours?</label>
+                <textarea name="message" rows="4" placeholder="Describe identifying details, serial numbers, etc..." class="w-full px-4 py-2 border border-gray-200 rounded-btn focus:outline-none focus:border-findr-accent transition" required></textarea>
+            </div>
+            <div class="flex gap-3 justify-end">
+                <button type="button" id="closeClaimModal" class="px-4 py-2 border border-gray-200 rounded-btn hover:bg-gray-50 transition">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-findr-accent hover:bg-amber-600 text-white rounded-btn transition">Submit Claim</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('claimModal');
+    const openBtn = document.getElementById('openClaimModal');
+    const closeBtn = document.getElementById('closeClaimModal');
+
+    if (openBtn) {
+        openBtn.onclick = () => modal.classList.remove('hidden');
+    }
+    if (closeBtn) {
+        closeBtn.onclick = () => modal.classList.add('hidden');
+    }
+    window.onclick = (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+    }
+</script>
+
+<footer class="bg-findr-surface border-t border-findr-border py-8 px-4 mt-12">
+    <div class="max-w-7xl mx-auto text-center text-findr-muted text-sm">
+        <p>&copy; 2024 Findr. All rights reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Claim Item</title>
+</head>
+<body>
+
+<h2>Claim Item</h2>
+
+<p>
+    Item: <span th:text="${item.name}"></span>
+</p>
+
+<form th:action="@{/claim/{id}(id=${item.id})}" method="post">
+    <textarea name="message" placeholder="Why is this yours?"></textarea>
+    <br/>
+    <button type="submit">Submit Claim</button>
+</form>
+
+</body>
+</html>

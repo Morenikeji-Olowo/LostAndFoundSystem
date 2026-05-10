@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Findr - Create Account</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'findr-primary': '#0D5C4A',
+                        'findr-accent': '#F5A623',
+                        'findr-muted': '#6B7280',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        'card': '24px',
+                        'btn': '12px',
+                        'input': '12px',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        input:focus {
+            box-shadow: 0 0 0 3px rgba(245, 166, 35, 0.1);
+            border-color: #F5A623;
+        }
+    </style>
+</head>
+<body class="font-sans bg-white min-h-screen flex items-center justify-center p-4">
+
+<!-- Simple Card -->
+<div class="max-w-md w-full">
+
+    <div class="mb-6">
+        <a href="/" class="inline-flex items-center gap-2 text-findr-muted hover:text-findr-primary transition text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Home
+        </a>
+    </div>
+    <!-- Logo -->
+    <div class="text-center mb-8">
+        <div class="flex items-center justify-center gap-2 mb-4">
+            <svg class="w-8 h-8 text-findr-primary" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 3a1 1 0 012 0v4a1 1 0 01-2 0V3zM6 8a2 2 0 00-2 2v3a2 2 0 002 2h8a2 2 0 002-2v-3a2 2 0 00-2-2H6z"/>
+                <path d="M4 14v3a2 2 0 002 2h8a2 2 0 002-2v-3H4z"/>
+            </svg>
+            <span class="font-bold text-2xl text-findr-primary">Findr</span>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900">Create an account</h1>
+        <p class="text-findr-muted text-sm mt-1">Join the campus community</p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white border border-gray-100 rounded-card p-6 md:p-8 shadow-sm">
+        <form th:action="@{/register}" th:object="${user}" method="post">            <!-- Full Name -->
+<!--            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>-->
+
+            <p th:if="${error}"
+               th:text="${error}"
+               class="text-red-500 text-sm mb-4 bg-red-50 p-3 rounded-lg border border-red-100">
+            </p>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2 text-sm">Full name</label>
+                <div class="relative">
+                    <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-findr-muted text-sm"></i>
+                    <input
+                            type="text"
+                            th:field="*{fullName}"
+                           placeholder="Alex Johnson"
+                           class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-input focus:outline-none focus:border-findr-accent transition">
+                </div>
+            </div>
+
+            <!-- Student ID -->
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2 text-sm">University ID</label>
+                <div class="relative">
+                    <i class="fas fa-id-card absolute left-4 top-1/2 transform -translate-y-1/2 text-findr-muted text-sm"></i>
+                    <input type="text"
+                           th:field="*{universityId}"
+
+                           placeholder="S12345678"
+                           class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-input focus:outline-none focus:border-findr-accent transition">
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2 text-sm">Email</label>
+                <div class="relative">
+                    <i class="fas fa-envelope absolute left-4 top-1/2 transform -translate-y-1/2 text-findr-muted text-sm"></i>
+                    <input type="email"
+                           th:field="*{email}"
+
+                           placeholder="alex@university.edu"
+                           class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-input focus:outline-none focus:border-findr-accent transition">
+                </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-4">
+                <label class="block text-gray-700 font-medium mb-2 text-sm">Password</label>
+                <div class="relative">
+                    <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-findr-muted text-sm"></i>
+                    <input type="password" id="password"
+                           th:field="*{password}"
+
+                           placeholder="Create a password"
+                           class="w-full pl-11 pr-12 py-3 border border-gray-200 rounded-input focus:outline-none focus:border-findr-accent transition">
+                    <i class="fas fa-eye-slash absolute right-4 top-1/2 transform -translate-y-1/2 text-findr-muted cursor-pointer text-sm" id="togglePassword"></i>
+                </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="mb-6">
+                <label class="block text-gray-700 font-medium mb-2 text-sm">Confirm password</label>
+                <div class="relative">
+                    <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-findr-muted text-sm"></i>
+                    <input type="password" id="confirmPassword"
+                           th:field="*{confirmPassword}"
+
+                           placeholder="Confirm your password"
+                           class="w-full pl-11 pr-12 py-3 border border-gray-200 rounded-input focus:outline-none focus:border-findr-accent transition">
+                    <i class="fas fa-eye-slash absolute right-4 top-1/2 transform -translate-y-1/2 text-findr-muted cursor-pointer text-sm" id="toggleConfirmPassword"></i>
+                </div>
+            </div>
+
+            <!-- Register Button -->
+            <button type="submit" class="w-full bg-findr-accent hover:bg-amber-600 text-white font-semibold py-3 rounded-btn transition">
+                Sign Up
+            </button>
+
+            <!-- Divider -->
+            <div class="flex items-center my-6">
+                <div class="flex-1 border-t border-gray-200"></div>
+                <span class="px-4 text-xs text-findr-muted">OR</span>
+                <div class="flex-1 border-t border-gray-200"></div>
+            </div>
+
+
+            <!-- Login Link -->
+            <p class="text-center text-sm text-findr-muted">
+                Already have an account?
+                <a href="/login" class="text-findr-accent font-semibold hover:underline">Sign in</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Toggle for password
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+
+    if (togglePassword && password) {
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    }
+
+    // Toggle for confirm password
+    const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+    const confirmPassword = document.getElementById('confirmPassword');
+
+    if (toggleConfirmPassword && confirmPassword) {
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmPassword.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+    }
+</script>
+
+</body>
+</html>
