@@ -1,186 +1,82 @@
-# 📦 Lost & Found Platform (Spring Boot)
+# Lost and Found Management System
 
-A simple Lost & Found web application built with Spring Boot. Users can post lost or found items, claim items, and manage claim approvals. The system is built using Spring MVC, Spring Data JPA, Thymeleaf, and MySQL.
+A centralised web platform for university students and staff to report lost items and found items — making the chaotic group chat approach a thing of the past.
 
----
+## The Problem
 
-## 🚀 Tech Stack
+Lost and found on campus has always been disorganised — scattered WhatsApp groups, notice boards, and word of mouth. This system brings everything into one place so students can quickly report what they've lost or found, and make claims on items.
 
-- Java 17+
-- Spring Boot
-- Spring Web (MVC)
-- Spring Data JPA
-- Thymeleaf (Frontend templates)
-- MySQL
+## Features
+
+- Report a lost item with details and images
+- Report a found item and submit it to the system
+- Browse and search all reported items
+- Make a claim on an item you believe is yours
+- User registration and login
+- Admin management of reports
+
+## Tech Stack
+
+- **Backend** — Java 21, Spring Boot 3
+- **Database** — PostgreSQL
+- **Frontend** — Thymeleaf, HTML, CSS
+- **Deployment** — Render (web service + managed PostgreSQL)
+
+## Getting Started
+
+### Prerequisites
+
+- Java 21
+- PostgreSQL
 - Maven
 
----
+### Running Locally
 
-## 📁 Project Structure
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Morenikeji-Olowo/LostAndFoundSystem.git
+   cd LostAndFoundSystem/Lost-And-Found-Management-system
+   ```
 
-```
-com.dede.lostfound
-│
-├── controller      → Handles HTTP requests
-├── service         → Business logic layer
-├── repository      → Database access layer
-├── entity          → Database models (JPA entities)
-└── LostFoundApplication.java
-```
+2. Create a PostgreSQL database:
+   ```sql
+   CREATE DATABASE lostandfoundDb;
+   ```
 
----
+3. Update `src/main/resources/application.properties` with your local database credentials:
+   ```properties
+   spring.datasource.url=jdbc:postgresql://localhost:5432/lostandfoundDb
+   spring.datasource.username=your_username
+   spring.datasource.password=your_password
+   ```
 
-## 🧠 Core Features Implemented
+4. Run the application:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
 
-### 1. Item Management
-- Users can post **Lost** or **Found** items
-- Items contain:
-  - Name
-  - Description
-  - Location
-  - Type (LOST / FOUND)
-  - Posting user (future improvement)
+5. Visit `http://localhost:8080` in your browser.
 
----
+## Deployment
 
-### 2. Claim System
-- Users can claim an item they believe belongs to them
-- Each claim contains:
-  - Message (proof or explanation)
-  - Status: `PENDING`, `APPROVED`, `REJECTED`
-  - Linked **User**
-  - Linked **Item**
-  - Timestamp of creation
+The application is deployed on [Render](https://render.com) using Docker.
 
----
+Environment variables required:
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | JDBC connection URL for PostgreSQL |
+| `DB_USER` | Database username |
+| `DB_PASSWORD` | Database password |
 
-### 3. Claim Review System
-- Item owners (or admin in current version) can:
-  - Approve a claim
-  - Reject a claim
-- Status updates are persisted in the database
-- Claims are displayed under each item detail page
+## Planned Improvements
 
----
+- Spring Security for proper role-based access control
+- In-app messaging so claimants and finders can connect directly
+- Email notifications when a match is found
+- Image uploads for item reports
+- Advanced search and filtering
 
-### 4. Item Detail View
-- Each item has a dedicated page showing:
-  - Item details
-  - All related claims
-  - Claim status updates in real time (after refresh)
+## Author
 
----
-
-## 🔁 Current Application Flow
-
-1. User views all items
-2. User clicks an item to view details
-3. User submits a claim on an item
-4. Claim is stored as **PENDING**
-5. Claim is reviewed and:
-   - Approved OR
-   - Rejected
-6. Updated status is shown under item details
-
----
-
-## 🗄️ Database Design (Current State)
-
-Entities:
-
-- **User**
-  - id, name, email, password
-
-- **Item**
-  - id, name, description, location, type, user
-
-- **Claim**
-  - id, message, status, user, item, createdAt
-
-- **Match** (optional / future use)
-  - id, lostItem, foundItem, similarityScore
-
----
-
-## ⚙️ Configuration
-
-MySQL database used:
-
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/lostfound_db
-spring.datasource.username=root
-spring.datasource.password=yourpassword
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-```
-
----
-
-## 📌 What Has Been Learned So Far
-
-- Spring Boot project structure (MVC architecture)
-- Entity relationships (OneToMany, ManyToOne)
-- Repository pattern using Spring Data JPA
-- Service layer separation for business logic
-- Thymeleaf templating for dynamic UI
-- Basic CRUD operations with database integration
-
----
-
-## 🧱 Known Limitations (Current Version)
-
-These are intentionally left for future improvement:
-
-- No authentication system yet (fake user used for now)
-- No role-based access (admin vs user)
-- No validation on forms
-- No pagination or filtering
-- No real-time updates
-- No matching intelligence logic yet
-
----
-
-## 🚀 Future Improvements
-
-Planned upgrades:
-
-### 🔐 Authentication & Security
-- User login / signup
-- Spring Security integration
-- Session-based access control
-
-### 🧑‍💼 Roles
-- Admin role (approve/reject claims properly)
-- Regular users (post items, make claims)
-
-### 🤖 Matching System
-- Auto-suggest matches between lost and found items
-- Similarity scoring algorithm (based on text/location)
-
-### 📊 UI Improvements
-- Better dashboard design
-- Item filtering (lost vs found)
-- Search functionality
-
-### ⚡ Backend Enhancements
-- DTO layer (clean API separation)
-- Validation (Spring Validation)
-- REST API version of the system
-
----
-
-## 🧠 Notes for Developers
-
-This project is structured for learning Spring Boot fundamentals:
-- Keep business logic inside services
-- Keep controllers thin
-- Let repositories handle database only
-- Avoid putting logic inside entities
-
----
-
-## 📍 Author
-
-Built as a learning project to understand full-stack Spring Boot development.
-
+Morenikeji Olowo  
+Computer Science — University Project (COS 202)
