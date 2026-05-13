@@ -26,6 +26,10 @@ public class ClaimService {
         this.claimRepository = claimRepository;
     }
 
+    public Claim getClaimById(Long id) {
+        return claimRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Claim not found"));
+    }
     public Claim createClaim(String message, User user, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 ()->new RuntimeException("Item not found")
@@ -53,5 +57,8 @@ public class ClaimService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(()->new RuntimeException("User not found"));
         return claimRepository.findClaimByUserId(user.getId());
+    }
+    public Claim save(Claim claim) {
+        return claimRepository.save(claim);
     }
 }

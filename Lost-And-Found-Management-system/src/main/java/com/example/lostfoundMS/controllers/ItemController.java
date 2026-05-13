@@ -59,22 +59,8 @@ public class ItemController {
         } else {
             model.addAttribute("isOwner", false);
         }
-
-        // debug AFTER everything is set
-        System.out.println("=== ITEM TYPE: " + item.getType());
-        System.out.println("=== ITEM STATUS: " + item.getStatus());
-        System.out.println("=== IS OWNER: " + model.getAttribute("isOwner"));
-        System.out.println("=== IS LOGGED IN: " + model.getAttribute("isLoggedIn"));
-
+        model.addAttribute("claims", claimService.getClaimsByItemId(item.getId()));
         return "item_detail";
     }
-    @PostMapping("/claim/{itemId}")
-    public String submitClaim(@PathVariable Long itemId,
-                              @RequestParam String message, HttpSession session) {
 
-        User curentUser = authUtils.getCurrentUser(session);
-        claimService.createClaim(message, curentUser, itemId);
-
-        return "redirect:/";
-    }
 }

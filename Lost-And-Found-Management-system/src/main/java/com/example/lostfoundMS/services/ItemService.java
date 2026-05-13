@@ -90,6 +90,9 @@ public class ItemService {
                 .filter(item -> item.getCategory().equalsIgnoreCase(category))
                 .toList();
     }
+    public Item save(Item item) {
+        return itemRepository.save(item);
+    }
     public List<Item> getAllItems() {
         return itemRepository.findAll();
     }

@@ -46,11 +46,12 @@
 <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Back button -->
-    <a href="/browse" class="inline-flex items-center gap-2 text-findr-muted hover:text-findr-primary transition mb-6">
+    <!-- Back button - goes to previous page -->
+    <a href="javascript:history.back()" class="inline-flex items-center gap-2 text-findr-muted hover:text-findr-primary transition mb-6">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
-        Back to Browse
+        Back
     </a>
 
     <!-- Claimed Banner -->
@@ -150,6 +151,83 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <!-- ========== CLAIMS SECTION (BOTTOM) ========== -->
+    <div class="mt-8 bg-white border border-findr-border rounded-card overflow-hidden">
+        <div class="px-6 py-4 border-b border-findr-border bg-findr-surface flex flex-wrap items-center justify-between gap-2">
+            <h2 class="font-poppins font-semibold text-lg">
+                <i class="fas fa-list-ul mr-2"></i> All Claims ( <span th:text="${#lists.size(claims)}">0</span> )
+            </h2>
+            <p class="text-xs text-findr-muted">Claims submitted by users</p>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-findr-muted border-b border-findr-border">
+                <tr>
+                    <th class="px-6 py-3 text-left font-semibold">Claimant</th>
+                    <th class="px-6 py-3 text-left font-semibold">Proof Description</th>
+                    <th class="px-6 py-3 text-left font-semibold">Submitted Date</th>
+                    <th class="px-6 py-3 text-left font-semibold">Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="claim : ${claims}" class="border-t border-findr-border hover:bg-findr-surface/50 transition">
+                    <!-- Claimant Name -->
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-findr-primary/10 rounded-full flex items-center justify-center">
+                                            <span class="text-findr-primary font-semibold text-xs uppercase"
+                                                  th:text="${claim.user.fullName != null ? claim.user.fullName.substring(0,1) : 'U'}">U</span>
+                            </div>
+                            <span class="font-medium text-findr-text" th:text="${claim.user.fullName}">John Doe</span>
+                        </div>
+                    </td>
+
+                    <!-- Proof Description -->
+                    <td class="px-6 py-4">
+                        <p class="text-findr-text max-w-xs line-clamp-2" th:text="${claim.proofDescription}">Proof description here...</p>
+                    </td>
+
+                    <!-- Submitted Date -->
+                    <td class="px-6 py-4 text-findr-muted">
+                        <span th:text="${#temporals.format(claim.createdAt, 'MMM dd, yyyy')}">Jan 15, 2024</span>
+                        <br>
+                        <span class="text-xs" th:text="${#temporals.format(claim.createdAt, 'hh:mm a')}">2:30 PM</span>
+                    </td>
+
+                    <!-- Status Badge -->
+                    <td class="px-6 py-4">
+                                    <span th:if="${claim.status.name() == 'PENDING'}"
+                                          class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-700">
+                                        <i class="fas fa-clock text-xs"></i> PENDING
+                                    </span>
+                        <span th:if="${claim.status.name() == 'APPROVED'}"
+                              class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700">
+                                        <i class="fas fa-check-circle text-xs"></i> APPROVED
+                                    </span>
+                        <span th:if="${claim.status.name() == 'REJECTED'}"
+                              class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-red-100 text-red-700">
+                                        <i class="fas fa-times-circle text-xs"></i> REJECTED
+                                    </span>
+                    </td>
+                </tr>
+
+                <!-- Empty State -->
+                <tr th:if="${#lists.isEmpty(claims)}">
+                    <td colspan="4" class="px-6 py-12 text-center">
+                        <div class="flex flex-col items-center justify-center">
+                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                                <i class="fas fa-comment-dots text-2xl text-findr-muted"></i>
+                            </div>
+                            <p class="text-findr-muted text-sm">No claims submitted yet</p>
+                            <p class="text-xs text-findr-muted mt-1">Be the first to claim this item</p>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </main>
