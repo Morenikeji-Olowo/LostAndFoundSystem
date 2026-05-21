@@ -41,8 +41,6 @@ public class Item {
     @Column(nullable = false)
     private LocalDate dateReported;
 
-    private String photoPath;
-
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -51,17 +49,6 @@ public class Item {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-        this.status = ItemStatus.OPEN;
-        String prefix = (this.type == ItemType.FOUND) ? "FND" : "LST";
-        String year = String.valueOf(LocalDateTime.now().getYear());
-        String random = String.format("%05d", (int)(Math.random() * 99999));
-
-        this.referenceCode = prefix + "-" + year + "-" + random;
-    }
 
     public Item() {
     }
@@ -128,14 +115,6 @@ public class Item {
 
     public void setLocation(String location) {
         this.location = location;
-    }
-
-    public String getPhotoPath() {
-        return photoPath;
-    }
-
-    public void setPhotoPath(String photoPath) {
-        this.photoPath = photoPath;
     }
 
     public LocalDateTime getCreatedAt() {

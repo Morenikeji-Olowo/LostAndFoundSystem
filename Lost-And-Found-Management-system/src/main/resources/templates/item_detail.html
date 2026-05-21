@@ -66,18 +66,6 @@
 
     <!-- Main Card -->
     <div class="bg-white border border-findr-border rounded-card overflow-hidden shadow-sm">
-        <!-- Image Section -->
-        <!-- if item has a photo show it, otherwise show a placeholder -->
-        <img th:if="${item.photoPath != null}"
-             th:src="${item.photoPath}"
-             alt="Item photo"
-             class="w-full rounded-card object-cover"/>
-
-        <div th:if="${item.photoPath == null}"
-             class="w-full h-48 bg-gray-100 rounded-card flex items-center justify-center">
-            <p class="text-findr-muted">No photo available</p>
-        </div>
-
         <!-- Content Section -->
         <div class="p-6 md:p-8">
             <!-- Header -->
@@ -157,7 +145,7 @@
     <div class="mt-8 bg-white border border-findr-border rounded-card overflow-hidden">
         <div class="px-6 py-4 border-b border-findr-border bg-findr-surface flex flex-wrap items-center justify-between gap-2">
             <h2 class="font-poppins font-semibold text-lg">
-                <i class="fas fa-list-ul mr-2"></i> All Claims ( <span th:text="${#lists.size(claims)}">0</span> )
+                <i class="fas fa-list-ul mr-2"></i> All Claims
             </h2>
             <p class="text-xs text-findr-muted">Claims submitted by users</p>
         </div>
@@ -179,7 +167,7 @@
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 bg-findr-primary/10 rounded-full flex items-center justify-center">
                                             <span class="text-findr-primary font-semibold text-xs uppercase"
-                                                  th:text="${claim.user.fullName != null ? claim.user.fullName.substring(0,1) : 'U'}">U</span>
+                                                  th:text="${claim.user.fullName != null ? claim.user.fullName : 'U'}">U</span>
                             </div>
                             <span class="font-medium text-findr-text" th:text="${claim.user.fullName}">John Doe</span>
                         </div>
@@ -215,7 +203,7 @@
                 </tr>
 
                 <!-- Empty State -->
-                <tr th:if="${#lists.isEmpty(claims)}">
+                <tr th:if="${claims.empty}">
                     <td colspan="4" class="px-6 py-12 text-center">
                         <div class="flex flex-col items-center justify-center">
                             <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-3">

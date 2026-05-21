@@ -33,12 +33,6 @@ public class Claim {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-        this.status = ClaimStatus.PENDING;
-    }
-
     public Claim() {}
 
     // Getters and Setters

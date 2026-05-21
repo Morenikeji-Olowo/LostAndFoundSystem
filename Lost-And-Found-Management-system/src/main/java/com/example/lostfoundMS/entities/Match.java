@@ -2,6 +2,7 @@ package com.example.lostfoundMS.entities;
 
 import jakarta.persistence.*;
 
+// remove
 @Entity
 @Table(name = "item_matches")
 public class Match {

@@ -48,6 +48,7 @@ public class UserController {
         var claims = claimService.getClaimsByUser(email);
         model.addAttribute("reports", reports);
 
+        //remove
         long lostCount = reports.stream()
                 .filter(i->i.getType() == ItemType.LOST)
                 .count();
@@ -61,19 +62,20 @@ public class UserController {
         model.addAttribute("lostCount", lostCount);
         model.addAttribute("foundCount", foundCount);
 
-        //empty array for now
         model.addAttribute("claims", claims);
         return "dashboard";
     }
 
     @PostMapping("/report")
-    public String postReport(@ModelAttribute Item item, @RequestParam String type, @RequestParam(required = false) MultipartFile photo, Model model,  HttpSession session) {
+    public String postReport(
+            @ModelAttribute Item item,
+            @RequestParam String type, Model model,  HttpSession session) {
         try{
             String email = authUtils.getCurrentUser(session).getEmail();
             if (type.equals("LOST")) {
-                itemService.reportLostItem(item, email, photo);
+                itemService.reportLostItem(item, email);
             } else {
-                itemService.reportFoundItem(item, email, photo);
+                itemService.reportFoundItem(item, email);
             }
 
             return "redirect:/dashBoard";

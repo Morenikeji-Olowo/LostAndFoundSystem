@@ -98,19 +98,6 @@
 
                 <div th:each="item : ${items}"
                      class="w-72 bg-white border border-findr-border rounded-card p-4 card-hover shrink-0">
-
-                    <div class="h-40 bg-gray-100 rounded-card mb-4 overflow-hidden flex items-center justify-center">
-                        <!-- when photo exists -->
-                        <img th:if="${item.photoPath != null}"
-                             th:src="${item.photoPath}"
-                             alt="Item photo"
-                             class="w-full h-full object-cover"/>
-                        <!-- object-cover fills the space without stretching -->
-
-                        <!-- when no photo -->
-                        <p th:if="${item.photoPath == null}"
-                           class="text-findr-muted text-sm">No photo</p>
-                    </div>
                     <div class="flex items-center gap-2 mb-2">
             <span class="text-xs font-semibold px-2 py-1 rounded-full bg-blue-100 text-blue-700"
                   th:text="${item.category}">Electronics</span>

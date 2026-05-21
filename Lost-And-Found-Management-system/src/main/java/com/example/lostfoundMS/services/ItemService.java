@@ -42,7 +42,7 @@ public class ItemService {
         }
     }
 
-    public void reportFoundItem(Item item, String email, MultipartFile photo){
+    public void reportFoundItem(Item item, String email){
         User user = userRepository.findByEmail(email)
                 .orElseThrow(()->new RuntimeException("User not found"));
 
@@ -51,11 +51,9 @@ public class ItemService {
 
         Item savedItem = itemRepository.save(item);
         try {
-            String photoPath = imageService.saveImage(photo, savedItem.getReferenceCode());
-            savedItem.setPhotoPath(photoPath);
             itemRepository.save(savedItem);
         } catch (Exception e) {
-            System.out.println("Image save failed: " + e.getMessage());
+            System.out.println("save failed: " + e.getMessage());
         }
 
     }
