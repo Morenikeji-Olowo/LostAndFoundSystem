@@ -74,15 +74,11 @@
 
         <form th:action="@{/login}" method="post">            <!-- Full Name -->
 <!--            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>-->
-            <p th:if="${param.error}"
+            <p th:if="${error}"
+               th:text="${error}"
                class="text-red-500 text-sm mb-4 bg-red-50 p-3 rounded-lg border border-red-100">
-                Incorrect email or password. Try again.
             </p>
 
-            <p th:if="${param.logout}"
-               class="text-green-600 text-sm mb-4 bg-green-50 p-3 rounded-lg border border-green-100">
-                You have been logged out successfully.
-            </p>
             <!-- Email -->
             <div class="mb-5">
                 <label class="block text-gray-700 font-medium mb-2 text-sm">Email</label>

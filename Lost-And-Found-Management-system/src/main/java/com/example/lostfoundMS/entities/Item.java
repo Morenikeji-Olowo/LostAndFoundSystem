@@ -30,7 +30,7 @@ public class Item {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ItemStatus status;
+    private ItemStatus status = ItemStatus.OPEN;
 
     @Column(unique = true)
     private String referenceCode;
@@ -42,9 +42,7 @@ public class Item {
     private LocalDate dateReported;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt;
-
-    // Who posted it
+    private LocalDateTime createdAt = LocalDateTime.now();
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

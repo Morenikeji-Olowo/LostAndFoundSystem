@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,18 +28,11 @@ public class AuthController {
             HttpSession session,
             Model model) {
 
-        System.out.println("=== LOGIN ATTEMPT ===");
-        System.out.println("Email: " + email);
-        System.out.println("Password: " + password);
-
         try {
             User user = userService.loginUser(email, password);
-            System.out.println("=== LOGIN SUCCESS: " + user.getEmail());
             session.setAttribute("loggedInUser", user);
             return "redirect:/";
-
         } catch (RuntimeException e) {
-            System.out.println("=== LOGIN FAILED: " + e.getMessage());
             model.addAttribute("error", e.getMessage());
             return "login";
         }
@@ -53,8 +47,17 @@ public class AuthController {
     @PostMapping("/register")
     public String handleRegister(@ModelAttribute User user, Model model){
         try{
+            if(!StringUtils.hasText(user.getEmail()) || !StringUtils.hasText(user.getPassword())
+                    || !StringUtils.hasText(user.getConfirmPassword()) || !StringUtils.hasText(user.getUniversityId())){
+                model.addAttribute("error", "All fields are required");
+                return "register";
+            }
             if(!user.getPassword().equals(user.getConfirmPassword())){
-                model.addAttribute("error","Passwords do not match");
+                model.addAttribute("error", "Passwords do not match");
+                return "register";
+            }
+            if(userService.getUser(user.getEmail()) != null){
+                model.addAttribute("error","User already exists");
                 return "register";
             }
             userService.registerUser(user);

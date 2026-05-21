@@ -21,41 +21,21 @@ public class ItemService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private ImageService imageService;
 
-    public void reportLostItem(Item item, String email, MultipartFile photo){
+    public void reportLostItem(Item item, String email){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("User not found"));
+                .orElseThrow(()-> new RuntimeException("User not found"));
         item.setUser(user);
         item.setType(ItemType.LOST);
-
-        Item savedItem = itemRepository.save(item);
-
-        try{
-            String photoPATH = imageService.saveImage(photo, savedItem.getReferenceCode());
-            savedItem.setPhotoPath(photoPATH);
-            itemRepository.save(savedItem);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+        itemRepository.save(item);
     }
 
     public void reportFoundItem(Item item, String email){
         User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("User not found"));
-
+                .orElseThrow(()-> new RuntimeException("User not found"));
         item.setUser(user);
         item.setType(ItemType.FOUND);
-
-        Item savedItem = itemRepository.save(item);
-        try {
-            itemRepository.save(savedItem);
-        } catch (Exception e) {
-            System.out.println("save failed: " + e.getMessage());
-        }
-
+        itemRepository.save(item);
     }
 
     public List<Item> getAllFoundItems(){

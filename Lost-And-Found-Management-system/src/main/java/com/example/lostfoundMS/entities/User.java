@@ -2,14 +2,10 @@ package com.example.lostfoundMS.entities;
 
 import jakarta.persistence.*;
 
-import java.io.Serializable;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User implements Serializable {
-    //remove
-    private static final long serialVersionUID = 1L;
+public class User{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,7 +16,7 @@ public class User implements Serializable {
     @Column(nullable = false, unique = true)
     private String universityId;
 
-    @Transient
+    @Column(nullable = false)
     private String confirmPassword;
 
     @Column(nullable = false, unique = true)
@@ -32,9 +28,7 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    // One user can post many items
-    @OneToMany(mappedBy = "user")
-    private List<Item> items;
+
 
     public User() {}
 
@@ -50,14 +44,6 @@ public class User implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public List<Item> getItems() {
-        return items;
-    }
-
-    public void setItems(List<Item> items) {
-        this.items = items;
     }
 
     public Role getRole() {
