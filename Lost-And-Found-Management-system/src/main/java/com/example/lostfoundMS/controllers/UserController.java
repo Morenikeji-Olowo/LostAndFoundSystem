@@ -48,20 +48,6 @@ public class UserController {
         var claims = claimService.getClaimsByUser(email);
         model.addAttribute("reports", reports);
 
-        //remove
-        long lostCount = reports.stream()
-                .filter(i->i.getType() == ItemType.LOST)
-                .count();
-        long foundCount = reports.stream()
-                .filter(i->i.getType() == ItemType.FOUND)
-                .count();
-        long claimCount = claims.size();
-
-        model.addAttribute("claimsCount", claimCount);
-
-        model.addAttribute("lostCount", lostCount);
-        model.addAttribute("foundCount", foundCount);
-
         model.addAttribute("claims", claims);
         return "dashboard";
     }

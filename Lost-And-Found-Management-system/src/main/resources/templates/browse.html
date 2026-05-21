@@ -97,23 +97,6 @@
            th:href="@{/item/{id}(id=${item.id})}"
            class="block bg-white border border-findr-border rounded-card p-4 card-hover">
 
-            <!-- Photo or placeholder -->
-            <div class="h-32 bg-gray-100 rounded-card mb-3 flex items-center justify-center overflow-hidden">
-                <img th:if="${item.photoPath != null}"
-                     th:src="@{${item.photoPath}}"
-                     alt="Item photo"
-                     class="w-full h-full object-cover rounded-card"/>
-                <span th:if="${item.photoPath == null}" class="text-5xl">
-                    <span th:if="${item.category == 'Electronics'}">Electronics</span>
-                    <span th:if="${item.category == 'Bag'}">Bag</span>
-                    <span th:if="${item.category == 'ID Card'}">Id Card</span>
-                    <span th:if="${item.category == 'Keys'}">Keys</span>
-                    <span th:if="${item.category == 'Clothing'}">Clothes</span>
-                    <span th:if="${item.category == 'Other'}">Other</span>
-                    <span th:if="${item.category == null}">📦</span>
-                </span>
-            </div>
-
             <!-- Badges -->
             <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">

@@ -4,16 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Findr - My Dashboard</title>
-
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
     <script>
         tailwind.config = {
             theme: {
@@ -41,12 +34,10 @@
 </head>
 <body class="font-roboto text-findr-text bg-white">
 
-<!-- Navbar -->
 <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <!-- Welcome Header with Quick Action -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
             <h1 class="font-poppins font-bold text-3xl text-findr-text">
@@ -59,49 +50,7 @@
         </a>
     </div>
 
-    <!-- Stat Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white border border-findr-border rounded-card p-5 shadow-sm hover:shadow-md transition">
-            <div class="flex items-start justify-between">
-                <div>
-                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-3">
-                        <span class="text-2xl">📝</span>
-                    </div>
-                    <h3 class="text-2xl font-bold text-findr-text" th:text="${lostCount}">0</h3>
-                    <p class="text-findr-text font-medium">Lost Reports</p>
-                    <p class="text-xs text-findr-muted mt-1">Items you've lost</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white border border-findr-border rounded-card p-5 shadow-sm hover:shadow-md transition">
-            <div class="flex items-start justify-between">
-                <div>
-                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
-                        <span class="text-2xl">🔍</span>
-                    </div>
-                    <h3 class="text-2xl font-bold text-findr-text" th:text="${foundCount}">0</h3>
-                    <p class="text-findr-text font-medium">Found Reports</p>
-                    <p class="text-xs text-findr-muted mt-1">Items you've found</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white border border-findr-border rounded-card p-5 shadow-sm hover:shadow-md transition">
-            <div class="flex items-start justify-between">
-                <div>
-                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mb-3">
-                        <span class="text-2xl">⏳</span>
-                    </div>
-                    <h3 class="text-2xl font-bold text-findr-text" th:text="${pendingClaims}">0</h3>
-                    <p class="text-findr-text font-medium">Pending Claims</p>
-                    <p class="text-xs text-findr-muted mt-1">Awaiting review</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========== MY REPORTS TABLE (UPDATED with Claims Column) ========== -->
+    <!-- MY REPORTS TABLE -->
     <div class="bg-white border border-findr-border rounded-card overflow-hidden mb-8">
         <div class="px-6 py-4 border-b border-findr-border bg-findr-surface flex flex-wrap items-center justify-between gap-2">
             <h2 class="font-poppins font-semibold text-lg">📋 My Reports</h2>
@@ -117,7 +66,6 @@
                     <th class="px-6 py-3 text-left font-semibold">Status</th>
                     <th class="px-6 py-3 text-left font-semibold">Date</th>
                     <th class="px-6 py-3 text-left font-semibold">Location</th>
-                    <th class="px-6 py-3 text-left font-semibold">Claims</th>
                     <th class="px-6 py-3 text-left font-semibold">Actions</th>
                 </tr>
                 </thead>
@@ -128,20 +76,20 @@
                         <p class="text-xs text-findr-muted mt-0.5" th:text="${report.referenceCode}">REF-CODE</p>
                     </td>
                     <td class="px-6 py-3">
-                            <span th:if="${report.type.name() == 'LOST'}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-red-100 text-red-700">
-                                <i class="fas fa-frown text-xs"></i> Lost
-                            </span>
+                        <span th:if="${report.type.name() == 'LOST'}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-red-100 text-red-700">
+                            <i class="fas fa-frown text-xs"></i> Lost
+                        </span>
                         <span th:if="${report.type.name() == 'FOUND'}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700">
-                                <i class="fas fa-smile text-xs"></i> Found
-                            </span>
+                            <i class="fas fa-smile text-xs"></i> Found
+                        </span>
                     </td>
                     <td class="px-6 py-3">
-                            <span th:if="${report.status.name() == 'OPEN'}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">
-                                <i class="fas fa-circle text-[8px]"></i> Open
-                            </span>
+                        <span th:if="${report.status.name() == 'OPEN'}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700">
+                            <i class="fas fa-circle text-[8px]"></i> Open
+                        </span>
                         <span th:if="${report.status.name() == 'CLAIMED'}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 text-gray-700">
-                                <i class="fas fa-check-circle text-xs"></i> Claimed
-                            </span>
+                            <i class="fas fa-check-circle text-xs"></i> Claimed
+                        </span>
                     </td>
                     <td class="px-6 py-3 text-findr-muted" th:text="${#temporals.format(report.dateReported, 'MMM dd, yyyy')}">Jan 15, 2024</td>
                     <td class="px-6 py-3">
@@ -150,51 +98,17 @@
                             <span class="text-sm" th:text="${report.location}">Location</span>
                         </div>
                     </td>
-
-                    <!-- NEW Claims Column -->
                     <td class="px-6 py-3">
-                        <!-- For FOUND items - show claim count and link -->
-                        <div th:if="${report.type.name() == 'FOUND'}">
-                            <div th:if="${report.claimCount != null and report.claimCount > 0}">
-                                    <span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full bg-findr-primary/10 text-findr-primary">
-                                        <i class="fas fa-comments"></i> <span th:text="${report.claimCount}">3</span> claim(s)
-                                    </span>
-                                <a th:href="@{/item/{id}/claims(id=${report.id})}"
-                                   class="text-findr-accent hover:text-amber-600 text-xs ml-2 font-medium">
-                                    View Claims →
-                                </a>
-                            </div>
-                            <div th:unless="${report.claimCount != null and report.claimCount > 0}">
-                                <span class="text-xs text-findr-muted italic">No claims</span>
-                            </div>
-                        </div>
-                        <!-- For LOST items - show muted dash -->
-                        <div th:unless="${report.type.name() == 'FOUND'}">
-                            <span class="text-findr-muted">—</span>
-                        </div>
-                    </td>
-
-                    <td class="px-6 py-3">
-                        <div class="flex items-center gap-3">
-                            <a th:href="@{/item/{id}(id=${report.id})}"
-                               class="text-findr-primary hover:text-findr-primary/80 text-sm transition flex items-center gap-1">
-                                <i class="fas fa-eye"></i> View
-                            </a>
-                            <form th:action="@{/report/delete/{id}(id=${report.id})}"
-                                  method="post"
-                                  class="inline"
-                                  onsubmit="return confirm('⚠️ Are you sure you want to delete this report? This action cannot be undone.')">
-                                <button type="submit" class="text-red-500 hover:text-red-700 text-sm transition flex items-center gap-1">
-                                    <i class="fas fa-trash-alt"></i> Delete
-                                </button>
-                            </form>
-                        </div>
+                        <a th:href="@{/item/{id}(id=${report.id})}"
+                           class="text-findr-primary hover:text-findr-primary/80 text-sm transition flex items-center gap-1">
+                            <i class="fas fa-eye"></i> View
+                        </a>
                     </td>
                 </tr>
 
                 <!-- Empty State -->
-                <tr th:if="${#lists.isEmpty(reports)}">
-                    <td colspan="7" class="px-6 py-12 text-center">
+                <tr th:if="${reports == null or reports.isEmpty()}">
+                    <td colspan="6" class="px-6 py-12 text-center">
                         <div class="flex flex-col items-center justify-center">
                             <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                                 <i class="fas fa-clipboard-list text-3xl text-findr-muted"></i>
@@ -212,7 +126,7 @@
         </div>
     </div>
 
-    <!-- ========== MY CLAIMS TABLE (UPDATED with View Item Arrow) ========== -->
+    <!-- MY CLAIMS TABLE -->
     <div class="bg-white border border-findr-border rounded-card overflow-hidden">
         <div class="px-6 py-4 border-b border-findr-border bg-findr-surface flex flex-wrap items-center justify-between gap-2">
             <h2 class="font-poppins font-semibold text-lg">🎯 My Claims</h2>
@@ -226,8 +140,6 @@
                     <th class="px-6 py-3 text-left font-semibold">Item Name</th>
                     <th class="px-6 py-3 text-left font-semibold">Claim Status</th>
                     <th class="px-6 py-3 text-left font-semibold">Date Submitted</th>
-                    <th class="px-6 py-3 text-left font-semibold">Reference</th>
-                    <th class="px-6 py-3 text-left font-semibold">Admin Note</th>
                     <th class="px-6 py-3 text-left font-semibold"></th>
                 </tr>
                 </thead>
@@ -237,25 +149,17 @@
                         <span class="font-medium text-findr-text" th:text="${claim.item.name}">Item Name</span>
                     </td>
                     <td class="px-6 py-3">
-                            <span th:if="${claim.status.name() == 'PENDING'}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-700">
-                                <i class="fas fa-clock"></i> Pending
-                            </span>
+                        <span th:if="${claim.status.name() == 'PENDING'}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-700">
+                            <i class="fas fa-clock"></i> Pending
+                        </span>
                         <span th:if="${claim.status.name() == 'APPROVED'}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700">
-                                <i class="fas fa-check-circle"></i> Approved
-                            </span>
+                            <i class="fas fa-check-circle"></i> Approved
+                        </span>
                         <span th:if="${claim.status.name() == 'REJECTED'}" class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-red-100 text-red-700">
-                                <i class="fas fa-times-circle"></i> Rejected
-                            </span>
+                            <i class="fas fa-times-circle"></i> Rejected
+                        </span>
                     </td>
                     <td class="px-6 py-3 text-findr-muted" th:text="${#temporals.format(claim.createdAt, 'MMM dd, yyyy')}">Jan 16, 2024</td>
-                    <td class="px-6 py-3">
-                        <span class="text-xs font-mono text-findr-muted" th:text="${claim.item.referenceCode}">FND-2024-00123</span>
-                    </td>
-                    <td class="px-6 py-3">
-                        <span class="text-findr-muted text-sm" th:text="${claim.adminNote != null ? claim.adminNote : '—'}">—</span>
-                    </td>
-
-                    <!-- NEW View Item Arrow Column -->
                     <td class="px-6 py-3">
                         <a th:href="@{/item/{id}(id=${claim.item.id})}"
                            class="text-findr-primary hover:text-findr-primary/80 transition inline-flex items-center gap-1"
@@ -267,7 +171,7 @@
                 </tr>
 
                 <!-- Empty State -->
-                <tr th:if="${#lists.isEmpty(claims)}">
+                <tr th:if="${claims == null or claims.isEmpty()}">
                     <td colspan="6" class="px-6 py-12 text-center">
                         <div class="flex flex-col items-center justify-center">
                             <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -284,26 +188,8 @@
         </div>
     </div>
 
-    <!-- Quick Tips Section -->
-    <div class="mt-8 bg-gradient-to-r from-findr-primary/5 to-findr-accent/5 rounded-card p-5 border border-findr-border">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div class="flex items-start gap-3">
-                <div class="w-10 h-10 bg-findr-primary/10 rounded-full flex items-center justify-center shrink-0">
-                    <i class="fas fa-lightbulb text-findr-primary"></i>
-                </div>
-                <div>
-                    <h3 class="font-poppins font-semibold text-findr-text">Pro Tip 💡</h3>
-                    <p class="text-sm text-findr-muted">Add clear photos and detailed descriptions to help identify your items faster. The more details, the better!</p>
-                </div>
-            </div>
-            <a href="/guidelines" class="text-findr-primary hover:text-findr-primary/80 text-sm font-medium flex items-center gap-1 shrink-0">
-                View Pickup Guidelines <i class="fas fa-arrow-right text-xs"></i>
-            </a>
-        </div>
-    </div>
 </main>
 
-<!-- Footer -->
 <footer class="bg-findr-surface border-t border-findr-border py-8 px-4 mt-12">
     <div class="max-w-7xl mx-auto text-center text-findr-muted text-sm">
         <p>&copy; 2024 Findr. All rights reserved. Made with love for our campus community.</p>

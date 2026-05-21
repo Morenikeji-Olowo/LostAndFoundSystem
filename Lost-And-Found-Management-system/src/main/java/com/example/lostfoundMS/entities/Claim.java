@@ -25,13 +25,13 @@ public class Claim {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ClaimStatus status;
+    private ClaimStatus status = ClaimStatus.PENDING;
 
     @Column(length = 500)
     private String adminNote;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public Claim() {}
 
