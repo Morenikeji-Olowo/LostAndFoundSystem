@@ -21,6 +21,7 @@ public class AuthController {
     public String loginPage(){
         return "login";
     }
+
     @PostMapping("/login")
     public String handleLogin(
             @RequestParam String email,

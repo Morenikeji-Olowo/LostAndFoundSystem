@@ -24,7 +24,6 @@ public class AuthUtils {
        return session.getAttribute("loggedInUser") != null;
     }
 
-    // add this to AuthUtils
     public void addAuthAttributes(HttpSession session, Model model) {
         if (isLoggedIn(session)) {
             model.addAttribute("isLoggedIn", true);

@@ -55,8 +55,40 @@ public class UserController {
     @PostMapping("/report")
     public String postReport(
             @ModelAttribute Item item,
-            @RequestParam String type, Model model,  HttpSession session) {
-        try{
+            @RequestParam String type,
+            Model model,
+            HttpSession session) {
+        try {
+            boolean isValid = true;
+
+            if (item.getName() == null || item.getName().trim().isEmpty()) {
+                model.addAttribute("nameError", "Item name is required");
+                isValid = false;
+            }
+            if (item.getCategory() == null || item.getCategory().trim().isEmpty()) {
+                model.addAttribute("categoryError", "Please select a category");
+                isValid = false;
+            }
+            if (item.getDescription() == null || item.getDescription().trim().isEmpty()) {
+                model.addAttribute("descError", "Description is required");
+                isValid = false;
+            }
+            if (item.getDateReported() == null) {
+                model.addAttribute("dateError", "Date is required");
+                isValid = false;
+            }
+            if (item.getLocation() == null || item.getLocation().trim().isEmpty()) {
+                model.addAttribute("locationError", "Location is required");
+                isValid = false;
+            }
+
+            if (!isValid) {
+                model.addAttribute("item", item);
+                model.addAttribute("selectedType", type);
+                authUtils.addAuthAttributes(session, model);
+                return "report";
+            }
+
             String email = authUtils.getCurrentUser(session).getEmail();
             if (type.equals("LOST")) {
                 itemService.reportLostItem(item, email);
@@ -65,12 +97,13 @@ public class UserController {
             }
 
             return "redirect:/dashBoard";
-        }
-        catch (Exception e) {
+
+        } catch (Exception e) {
             System.out.println("ERROR: " + e.getMessage());
-            e.printStackTrace();  // this prints the full error to console
+            e.printStackTrace();
             model.addAttribute("error", e.getMessage());
             model.addAttribute("item", item);
+            model.addAttribute("selectedType", type);
             authUtils.addAuthAttributes(session, model);
             return "report";
         }

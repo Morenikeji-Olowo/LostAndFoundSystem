@@ -49,35 +49,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
             User currentUser = authUtils.getCurrentUser(session);
             if (!item.getUser().getId().equals(currentUser.getId())) {
-                return "redirect:/item/" + id; // not the owner, send them away
+                return "redirect:/item/" + id;
             }
 
             model.addAttribute("item", item);
             model.addAttribute("claims", claimService.getClaimsByItemId(id));
             return "item_claims";
-        }
-
-        @PostMapping("/claim/{id}/approve")
-        public String approveClaim(@PathVariable Long id, HttpSession session) {
-            Claim claim = claimService.getClaimById(id);
-            claim.setStatus(ClaimStatus.APPROVED);
-            claimService.save(claim);
-
-            // mark the item as claimed
-            Item item = claim.getItem();
-            item.setStatus(ItemStatus.CLAIMED);
-            itemService.save(item);
-
-            return "redirect:/item/" + item.getId() + "/claims";
-        }
-
-        @PostMapping("/claim/{id}/reject")
-        public String rejectClaim(@PathVariable Long id, HttpSession session) {
-            Claim claim = claimService.getClaimById(id);
-            claim.setStatus(ClaimStatus.REJECTED);
-            claimService.save(claim);
-
-            return "redirect:/item/" + claim.getItem().getId() + "/claims";
         }
     }
 

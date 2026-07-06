@@ -3,7 +3,6 @@
 <nav class="sticky top-0 z-50 bg-white border-b border-findr-border h-16" th:fragment="navbar">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
         <div class="flex items-center justify-between h-full gap-4">
-            <!-- Logo (clickable) -->
             <a href="/" class="flex items-center gap-2 shrink-0 hover:opacity-80 transition">
                 <svg class="w-8 h-8 text-findr-primary" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9 3a1 1 0 012 0v4a1 1 0 01-2 0V3zM6 8a2 2 0 00-2 2v3a2 2 0 002 2h8a2 2 0 002-2v-3a2 2 0 00-2-2H6z"/>
@@ -18,7 +17,6 @@
                 <a href="/browse" class="text-findr-text hover:text-findr-primary font-medium transition">Browse Items</a>
             </div>
 
-            <!-- ========== NOT LOGGED IN ========== -->
             <div th:if="${!isLoggedIn}" class="flex items-center gap-3">
                 <a href="/login" class="text-findr-primary hover:text-findr-primary/80 font-semibold px-4 py-2 rounded-btn transition">
                     Login
@@ -28,7 +26,6 @@
                 </a>
             </div>
 
-            <!-- ========== LOGGED IN ========== -->
             <div th:if="${isLoggedIn}" class="flex items-center gap-4">
                 <!-- User Avatar + Name + Role -->
                 <div class="flex items-center gap-3">
@@ -40,12 +37,10 @@
                     </div>
                 </div>
 
-                <!-- Dashboard Link -->
                 <a href="/dashBoard" class="text-findr-primary hover:text-findr-primary/80 font-medium text-sm transition">
                     Dashboard
                 </a>
 
-                <!-- Logout Form -->
                 <form action="/logout" method="post" class="inline">
                     <button type="submit" class="text-findr-muted hover:text-red-500 font-medium text-sm transition flex items-center gap-1">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
