@@ -14,24 +14,4 @@ public class UserService{
     @Autowired
     UserRepository userRepository;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    public void registerUser(User user){
-        if(userRepository.findByEmail(user.getEmail()).isPresent()){
-            throw new RuntimeException("EMail already exists");
-        }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(Role.ROLE_USER);
-        userRepository.save(user);
-    }
-
-    public User loginUser(String email, String password){
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(()-> new RuntimeException("No account found"));
-        if(!passwordEncoder.matches(password, user.getPassword())){
-            throw new RuntimeException("Incorrect password");
-        }
-        return user;
-    }
-
 }

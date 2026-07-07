@@ -1,31 +1,35 @@
 package com.example.lostfoundMS.repo;
 
 import com.example.lostfoundMS.entities.Item;
+import com.example.lostfoundMS.entities.enums.ItemModerationStatus;
 import com.example.lostfoundMS.entities.enums.ItemStatus;
 import com.example.lostfoundMS.entities.enums.ItemType;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    @Query("SELECT i FROM Item i WHERE i.type = :type")
-    List<Item> findByType(@Param("type")ItemType type);
+    Optional<Item> findByReferenceCode(String referenceCode);
 
-    @Query("SELECT i FROM Item i WHERE i.user.id = :userId")
-    List<Item> findByUserId(@Param("userId") Long userId);
+    // Public bulletin board: only approved + active items
+    List<Item> findByModerationStatusAndItemStatus(
+        ItemModerationStatus moderationStatus, ItemStatus itemStatus
+    );
 
-    @Query("SELECT i FROM Item i WHERE i.type = :type AND i.itemStatus = :status")
-    List<Item> findByTypeAndStatus(@Param("type")ItemType type, @Param("status")ItemStatus status);
+    // Admin moderation queue
+    List<Item> findByModerationStatus(ItemModerationStatus moderationStatus);
 
-    @Query("SELECT i FROM Item i WHERE i.type = :type AND " +
-            "(LOWER(i.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(i.description) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    List<Item> searchByKeyword(@Param("type") ItemType type,
-                               @Param("keyword") String keyword);
+    // Candidate pool for the matching job: opposite type, same category, still active
+    List<Item> findByTypeAndCategoryAndItemStatus(
+        ItemType type, String category, ItemStatus itemStatus
+    );
 
-    @Query("SELECT i FROM Item i ORDER BY i.createdAt DESC LIMIT 4")
-    List<Item> getTop4Items ();
+    // A user's own reported items, for their dashboard
+    List<Item> findByUserId(Long userId);
+
+    // Auto-archive job: active items older than a cutoff date
+    List<Item> findByItemStatusAndDateReportedBefore(ItemStatus itemStatus, LocalDate cutoff);
 }
