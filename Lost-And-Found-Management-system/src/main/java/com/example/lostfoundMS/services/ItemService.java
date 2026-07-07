@@ -1,7 +1,7 @@
 package com.example.lostfoundMS.services;
 
 import com.example.lostfoundMS.entities.Item;
-import com.example.lostfoundMS.entities.ItemType;
+import com.example.lostfoundMS.entities.enums.ItemType;
 import com.example.lostfoundMS.entities.User;
 import com.example.lostfoundMS.repo.ItemRepository;
 

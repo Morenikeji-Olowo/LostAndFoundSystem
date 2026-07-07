@@ -1,6 +1,7 @@
 package com.example.lostfoundMS.services;
 
 import com.example.lostfoundMS.entities.*;
+import com.example.lostfoundMS.entities.enums.ClaimStatus;
 import com.example.lostfoundMS.repo.ClaimRepository;
 import com.example.lostfoundMS.repo.ItemRepository;
 import com.example.lostfoundMS.repo.UserRepository;
@@ -31,7 +32,7 @@ public class ClaimService {
                 ()->new RuntimeException("Item not found")
         );
         Claim claim = new Claim();
-        claim.setUser(user);
+        claim.setClaimant(user);
         claim.setItem(item);
         claim.setProofDescription(message);
         return claimRepository.save(claim);

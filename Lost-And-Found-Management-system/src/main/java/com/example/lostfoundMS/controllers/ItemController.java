@@ -1,6 +1,5 @@
 package com.example.lostfoundMS.controllers;
 
-import com.example.lostfoundMS.entities.ClaimStatus;
 import com.example.lostfoundMS.entities.Item;
 import com.example.lostfoundMS.entities.User;
 import com.example.lostfoundMS.services.ClaimService;
@@ -8,7 +7,6 @@ import com.example.lostfoundMS.services.ItemService;
 import com.example.lostfoundMS.utils.AuthUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -62,7 +60,7 @@ public class ItemController {
 
         // debug AFTER everything is set
         System.out.println("=== ITEM TYPE: " + item.getType());
-        System.out.println("=== ITEM STATUS: " + item.getStatus());
+        System.out.println("=== ITEM STATUS: " + item.getItemStatus());
         System.out.println("=== IS OWNER: " + model.getAttribute("isOwner"));
         System.out.println("=== IS LOGGED IN: " + model.getAttribute("isLoggedIn"));
 

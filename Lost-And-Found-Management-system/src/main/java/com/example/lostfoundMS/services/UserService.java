@@ -1,6 +1,6 @@
 package com.example.lostfoundMS.services;
 
-import com.example.lostfoundMS.entities.Role;
+import com.example.lostfoundMS.entities.enums.Role;
 import com.example.lostfoundMS.entities.User;
 import com.example.lostfoundMS.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

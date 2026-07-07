@@ -10,13 +10,13 @@ import java.util.Optional;
 
 public interface ClaimRepository extends JpaRepository<Claim, Long> {
 //    List<Claim> findByItemId(Long itemId);
-    @Query("SELECT c FROM Claim c WHERE c.user.id = :userId")
+    @Query("SELECT c FROM Claim c WHERE c.claimant.id = :userId")
     List<Claim> findClaimByUserId(@Param("userId") Long userId);
 
     @Query("SELECT c FROM Claim c WHERE c.item.id = :itemId")
     List<Claim> findByItemId(@Param("itemId") Long itemId);
 
-    @Query("SELECT c FROM Claim c WHERE c.user.id = :userId AND c.item.id = :itemId")
+    @Query("SELECT c FROM Claim c WHERE c.claimant.id = :userId AND c.item.id = :itemId")
     Optional<Claim> findByUserIdAndItemId(@Param("userId") Long userId, @Param("itemId") Long itemId);
 
 }

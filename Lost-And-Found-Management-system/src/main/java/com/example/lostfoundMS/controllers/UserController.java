@@ -1,11 +1,9 @@
 package com.example.lostfoundMS.controllers;
 
-import com.example.lostfoundMS.entities.ClaimStatus;
 import com.example.lostfoundMS.entities.Item;
-import com.example.lostfoundMS.entities.ItemType;
+import com.example.lostfoundMS.entities.enums.ItemType;
 import com.example.lostfoundMS.services.ClaimService;
 import com.example.lostfoundMS.services.ItemService;
-import com.example.lostfoundMS.services.UserService;
 import com.example.lostfoundMS.utils.AuthUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
