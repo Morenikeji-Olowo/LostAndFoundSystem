@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Claims - Veritas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .shadow-soft { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .shadow-soft-hover:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
+        .border-soft { border-color: #E5E7EB; }
+        .status-pending { background: #FFF3E0; color: #E65100; }
+        .status-approved { background: #E8F5E9; color: #2E7D32; }
+        .status-rejected { background: #FEE2E2; color: #DC2626; }
+        .claim-card-pending { border-left: 3px solid #C49B2D; }
+        .claim-card-approved { border-left: 3px solid #2D7A3E; opacity: 0.7; }
+        .claim-card-rejected { border-left: 3px solid #DC2626; opacity: 0.7; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen py-8">
+<div class="max-w-4xl mx-auto px-4">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Review Claims</h1>
+                <p class="text-gray-500 mt-1" th:if="${item != null}">
+                    For: <span class="font-medium text-gray-700" th:text="${item.name}">Item Name</span>
+                    <span class="text-gray-400 mx-1">·</span>
+                    <span class="text-sm" th:text="'Ref: ' + ${item.referenceCode}">Ref: REF123</span>
+                </p>
+            </div>
+            <a href="/items" class="px-6 py-2.5 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-700 transition shadow-soft">
+                ← Back to Items
+            </a>
+        </div>
+    </div>
+
+    <!-- Claims List -->
+    <div th:if="${claims != null && !claims.empty}" class="space-y-4">
+        <div th:each="claim : ${claims}"
+             th:class="'bg-white rounded-xl shadow-soft border border-gray-100 p-6 claim-card-' + ${claim.status.name().toLowerCase()}">
+
+            <!-- Claim Header -->
+            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <h3 class="font-semibold text-gray-900" th:text="${claim.claimant.fullName}">Claimant Name</h3>
+                        <span th:class="'px-2.5 py-0.5 text-xs font-semibold rounded-full status-' + ${claim.status.name().toLowerCase()}"
+                              th:text="${claim.status.name()}">PENDING</span>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1" th:text="'Submitted: ' + ${#temporals.format(claim.createdAt, 'MMM dd, yyyy \'at\' HH:mm')}">Submitted: Jan 01, 2024 at 14:30</p>
+                </div>
+                <span class="text-xs text-gray-400" th:text="'Claim #' + ${claim.id}">Claim #123</span>
+            </div>
+
+            <!-- Proof Description -->
+            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                <p class="text-sm font-medium text-gray-700 mb-1">📝 Proof Provided</p>
+                <p class="text-gray-800" th:text="${claim.proofDescription}">Proof description text goes here...</p>
+            </div>
+
+            <!-- Action Buttons (only for PENDING claims) -->
+            <div th:if="${claim.status.name() == 'PENDING'}" class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
+                <!-- Approve -->
+                <form th:action="@{/claims/{id}/approve(id=${claim.id})}" method="post"
+                      onsubmit="return confirm('Approve this claim? The claimant will be notified.')">
+                    <button type="submit" class="px-6 py-2 bg-[#2D7A3E] text-white rounded-lg font-medium hover:bg-[#236632] transition shadow-soft">
+                        ✅ Approve
+                    </button>
+                </form>
+
+                <!-- Reject -->
+                <form th:action="@{/claims/{id}/reject(id=${claim.id})}" method="post"
+                      onsubmit="return confirm('Reject this claim? This action is final.')" class="flex items-center gap-2">
+                    <input type="text" name="adminNote" placeholder="Reason for rejection (optional)"
+                           class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-[#DC2626] transition w-48">
+                    <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition shadow-soft">
+                        ❌ Reject
+                    </button>
+                </form>
+
+                <!-- Escalation -->
+                <a th:href="'/issues/raise?claimId=' + ${claim.id}"
+                   class="text-sm text-[#C49B2D] hover:text-[#A88225] font-medium ml-auto transition">
+                    ⚠️ Report a problem with this claim
+                </a>
+            </div>
+
+            <!-- Read-only for approved/rejected -->
+            <div th:if="${claim.status.name() == 'APPROVED'}" class="pt-4 border-t border-gray-100">
+                <span class="text-sm text-green-700 font-medium">✓ This claim has been approved</span>
+            </div>
+            <div th:if="${claim.status.name() == 'REJECTED'}" class="pt-4 border-t border-gray-100">
+                <span class="text-sm text-red-700 font-medium">✗ This claim has been rejected</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${claims == null || claims.empty}" class="text-center py-16 bg-white rounded-xl shadow-soft border border-gray-100">
+        <div class="max-w-sm mx-auto">
+            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">No claims submitted yet</h3>
+            <p class="text-gray-500">Nobody has claimed this item so far.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

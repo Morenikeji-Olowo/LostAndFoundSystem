@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report an Issue - Veritas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .shadow-soft { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .shadow-soft-hover:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
+        .border-soft { border-color: #E5E7EB; }
+        .error-text { color: #DC2626; }
+        textarea:focus { box-shadow: 0 0 0 3px rgba(45, 122, 62, 0.15); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen py-12">
+<div class="max-w-3xl mx-auto px-4">
+    <!-- Header -->
+    <div class="mb-8 text-center">
+        <div class="flex justify-center mb-3">
+            <span class="text-4xl">🛟</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900">Need Help With a Claim?</h1>
+        <p class="text-gray-500 mt-1">An administrator will review your concern and help resolve it</p>
+    </div>
+
+    <!-- Global Error Slot -->
+    <div th:if="${#fields.hasErrors('global')}" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+        <ul>
+            <li th:each="err : ${#fields.errors('global')}" th:text="${err}">Global error message</li>
+        </ul>
+    </div>
+
+    <!-- Claim Context (Read-only) -->
+    <div th:if="${claim != null}" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <p class="text-sm text-gray-700">
+            <span class="font-medium">Claim #<span th:text="${claim.id}">123</span></span>
+            <span class="text-gray-400 mx-2">·</span>
+            <span th:text="${claim.claimant.fullName}">Claimant Name</span>
+            <span class="text-gray-400 mx-2">·</span>
+            <span class="text-gray-600" th:text="'Item: ' + ${claim.item.name}">Item: Lost Backpack</span>
+        </p>
+    </div>
+
+    <!-- Form -->
+    <form th:action="@{/issues/raise}" th:object="${raiseIssueRequest}" method="post" class="bg-white rounded-xl shadow-soft p-8 border border-gray-100">
+
+        <!-- Hidden Claim ID -->
+        <input type="hidden" th:field="*{claimId}" />
+
+        <!-- Message -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                What's the problem?
+                <span class="text-red-500">*</span>
+            </label>
+            <textarea th:field="*{message}" rows="5"
+                      class="w-full rounded-lg border border-gray-200 px-4 py-3 focus:outline-none focus:border-[#2D7A3E] transition resize-y"
+                      placeholder="Describe what's going on — an admin will step in and help resolve this. For example: 'The claimant is providing inaccurate information' or 'The item doesn't match what was found.'"></textarea>
+            <p class="text-sm text-gray-500 mt-2">
+                💡 Be clear and specific. An admin will review your concern and take appropriate action.
+            </p>
+            <span th:if="${#fields.hasErrors('message')}" th:errors="*{message}" class="error-text text-sm block mt-1"></span>
+        </div>
+
+        <!-- Submit -->
+        <div class="flex gap-3">
+            <button type="submit" class="flex-1 px-6 py-3 bg-[#C49B2D] text-white rounded-lg font-medium hover:bg-[#A88225] transition shadow-soft">
+                Report to Admin
+            </button>
+            <a th:href="'/items'" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">Cancel</a>
+        </div>
+
+        <p class="text-xs text-gray-400 mt-4 text-center">
+            This is a support channel for disputes and issues. An administrator will reach out to both parties.
+        </p>
+    </form>
+</div>
+</body>
+</html>

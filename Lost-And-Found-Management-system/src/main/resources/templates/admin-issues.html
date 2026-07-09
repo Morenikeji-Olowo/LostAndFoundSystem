@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Issues - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .shadow-soft { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .shadow-soft-hover:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
+        .border-soft { border-color: #E5E7EB; }
+        .status-open { border-left: 3px solid #C49B2D; }
+        .status-in-progress { border-left: 3px solid #2196F3; }
+        .status-resolved { border-left: 3px solid #2D7A3E; }
+        .badge-open { background: #FFF3E0; color: #E65100; }
+        .badge-in-progress { background: #E3F2FD; color: #1565C0; }
+        .badge-resolved { background: #E8F5E9; color: #2E7D32; }
+        textarea:focus { box-shadow: 0 0 0 3px rgba(45, 122, 62, 0.15); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen py-8">
+<div class="max-w-5xl mx-auto px-4">
+    <!-- Header -->
+    <div class="mb-8">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Open Issues</h1>
+                <p class="text-gray-500 mt-1">Review and resolve user-reported disputes</p>
+            </div>
+            <a href="/admin/dashboard" class="px-6 py-2.5 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-700 transition shadow-soft">
+                ← Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Issues List -->
+    <div th:if="${issues != null && !issues.empty}" class="space-y-6">
+        <div th:each="issue : ${issues}"
+             th:class="'bg-white rounded-xl shadow-soft border border-gray-100 p-6 status-' + ${issue.status.name().toLowerCase().replace('_', '-')}">
+
+            <!-- Issue Header -->
+            <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <h3 class="font-semibold text-gray-900" th:text="'Issue #' + ${issue.id}">Issue #123</h3>
+                        <span th:class="'px-2.5 py-0.5 text-xs font-semibold rounded-full badge-' + ${issue.status.name().toLowerCase().replace('_', '-')}"
+                              th:text="${issue.status.name().replace('_', ' ')}">OPEN</span>
+                    </div>
+                    <div class="flex flex-wrap gap-4 mt-1 text-sm text-gray-600">
+                        <span>👤 <span th:text="${issue.raisedBy.fullName}">User Name</span></span>
+                        <span>📦 <span th:text="${issue.claim.item.name}">Item Name</span></span>
+                        <span>📝 <span th:text="'Claim #' + ${issue.claim.id}">Claim #123</span></span>
+                        <span>🕐 <span th:text="${#temporals.format(issue.createdAt, 'MMM dd, yyyy \'at\' HH:mm')}">Jan 01, 2024 at 14:30</span></span>
+                    </div>
+                </div>
+                <span class="text-xs text-gray-400" th:text="'Claimant: ' + ${issue.claim.claimant.fullName}">Claimant: John Doe</span>
+            </div>
+
+            <!-- Message -->
+            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                <p class="text-sm font-medium text-gray-700 mb-1">📧 User's Message</p>
+                <p class="text-gray-800" th:text="${issue.message}">Issue message text goes here...</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div th:if="${issue.status.name() == 'OPEN'}" class="flex flex-wrap items-center gap-4 pt-4 border-t border-gray-100">
+                <!-- Mark In Progress -->
+                <form th:action="@{/admin/issues/{id}/start(id=${issue.id})}" method="post">
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition shadow-soft">
+                        🔄 Mark In Progress
+                    </button>
+                </form>
+
+                <!-- Resolve -->
+                <form th:action="@{/admin/issues/{id}/resolve(id=${issue.id})}" method="post"
+                      onsubmit="return confirm('Resolve this issue? A response will be sent to all parties.')"
+                      class="flex items-center gap-2 flex-1">
+                        <textarea name="adminResponse" rows="2" required
+                                  class="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-[#2D7A3E] transition resize-y min-h-[50px]"
+                                  placeholder="Response to the user (required)"></textarea>
+                    <button type="submit" class="px-6 py-2 bg-[#2D7A3E] text-white rounded-lg font-medium hover:bg-[#236632] transition shadow-soft whitespace-nowrap">
+                        ✅ Resolve
+                    </button>
+                </form>
+            </div>
+
+            <!-- In Progress State -->
+            <div th:if="${issue.status.name() == 'IN_PROGRESS'}" class="pt-4 border-t border-gray-100">
+                <span class="text-sm text-blue-700 font-medium">⏳ This issue is being reviewed by an admin</span>
+            </div>
+
+            <!-- Resolved State -->
+            <div th:if="${issue.status.name() == 'RESOLVED'}" class="pt-4 border-t border-gray-100">
+                <span class="text-sm text-green-700 font-medium">✓ This issue has been resolved</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${issues == null || issues.empty}" class="text-center py-16 bg-white rounded-xl shadow-soft border border-gray-100">
+        <div class="max-w-sm mx-auto">
+            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">All Clear!</h3>
+            <p class="text-gray-500">No open issues to review. Everything is running smoothly.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
