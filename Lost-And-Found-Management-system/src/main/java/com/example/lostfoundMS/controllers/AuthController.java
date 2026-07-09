@@ -1,12 +1,9 @@
 package com.example.lostfoundMS.controllers;
 
-import com.example.lostfoundMS.entities.User;
 import com.example.lostfoundMS.entities.dto.ForgotPasswordRequest;
 import com.example.lostfoundMS.entities.dto.RegisterRequest;
 import com.example.lostfoundMS.entities.dto.ResetPasswordRequest;
 import com.example.lostfoundMS.services.AuthService;
-import com.example.lostfoundMS.services.UserService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,9 +17,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AuthController {
-    @Autowired
-    private UserService userService;
-
     @Autowired
     private AuthService  authService;
 

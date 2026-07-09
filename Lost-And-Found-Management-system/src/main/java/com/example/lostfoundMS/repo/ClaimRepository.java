@@ -3,9 +3,11 @@ package com.example.lostfoundMS.repo;
 import com.example.lostfoundMS.entities.Claim;
 import com.example.lostfoundMS.entities.enums.ClaimStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface ClaimRepository extends JpaRepository<Claim, Long> {
 
     // All claims on a specific item — the finder needs to see these

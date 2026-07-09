@@ -2,9 +2,11 @@ package com.example.lostfoundMS.repo;
 
 import com.example.lostfoundMS.entities.Match;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface MatchRepository extends JpaRepository<Match, Long> {
 
     // All candidate matches for a given lost item, e.g. to show "possible matches" on its page
