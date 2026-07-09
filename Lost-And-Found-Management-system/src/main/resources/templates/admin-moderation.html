@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moderation Queue - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .shadow-soft { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .shadow-soft-hover:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
+        .border-soft { border-color: #E5E7EB; }
+        .badge-pending { background: #FFF3E0; color: #E65100; }
+        .badge-lost { background: #FEE2E2; color: #DC2626; }
+        .badge-found { background: #DCFCE7; color: #16A34A; }
+        .private-detail-box { background: #F9FAFB; border-left: 3px solid #C49B2D; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen py-8">
+<div class="max-w-5xl mx-auto px-4">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Moderation Queue</h1>
+        <p class="text-gray-500 mt-1">Review and approve reported items before they go public</p>
+    </div>
+
+    <!-- Pending Items -->
+    <div th:if="${items != null && !items.empty}" class="space-y-6">
+        <div th:each="item : ${items}" class="bg-white rounded-xl shadow-soft border border-gray-100 overflow-hidden">
+            <div class="p-6">
+                <!-- Header -->
+                <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900" th:text="${item.name}">Item Name</h3>
+                        <div class="flex flex-wrap gap-2 mt-1">
+                            <span th:if="${item.type.name() == 'FOUND'}" class="badge-found px-2.5 py-0.5 text-xs font-semibold rounded-full">FOUND</span>
+                            <span th:if="${item.type.name() == 'LOST'}" class="badge-lost px-2.5 py-0.5 text-xs font-semibold rounded-full">LOST</span>
+                            <span class="badge-pending px-2.5 py-0.5 text-xs font-semibold rounded-full">PENDING</span>
+                            <span class="text-xs px-2.5 py-0.5 bg-gray-100 text-gray-700 rounded-full" th:text="${item.category}">Category</span>
+                        </div>
+                    </div>
+                    <span class="text-sm text-gray-500" th:text="'Ref: ' + ${item.referenceCode}">Ref: ABC123</span>
+                </div>
+
+                <!-- Details Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Description</p>
+                        <p class="text-gray-800" th:text="${item.description}">Description text</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Location</p>
+                        <p class="text-gray-800" th:text="${item.locationTag}">Location</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Reported On</p>
+                        <p class="text-gray-800" th:text="${#temporals.format(item.dateReported, 'MMM dd, yyyy')}">Date</p>
+                    </div>
+                    <div th:if="${item.imageUrl}">
+                        <p class="text-sm text-gray-500">Image</p>
+                        <img th:src="${item.imageUrl}" alt="Item image" class="h-24 w-auto rounded-lg object-cover mt-1 border border-gray-200">
+                    </div>
+                </div>
+
+                <!-- Private Details -->
+                <div class="private-detail-box p-4 rounded-lg mb-4">
+                    <p class="text-sm font-medium text-gray-700 mb-1">🔒 Private Detail (Hidden from Public)</p>
+                    <p class="text-gray-800" th:text="${item.privateDetails}">Private details shown only to admins</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-3 pt-4 border-t border-gray-100">
+                    <form th:action="@{/admin/moderation/{id}/approve(id=${item.id})}" method="post" onsubmit="return confirm('Approve this item and make it publicly visible?')">
+                        <button type="submit" class="px-6 py-2.5 bg-[#2D7A3E] text-white rounded-lg font-medium hover:bg-[#236632] transition shadow-soft">
+                            ✅ Approve
+                        </button>
+                    </form>
+                    <form th:action="@{/admin/moderation/{id}/reject(id=${item.id})}" method="post" onsubmit="return confirm('Reject this item? This cannot be undone.')">
+                        <button type="submit" class="px-6 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition shadow-soft">
+                            ❌ Reject
+                        </button>
+                    </form>
+                    <span class="text-xs text-gray-400 self-center ml-2">Admins only — this action is logged</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${items == null || items.empty}" class="text-center py-16 bg-white rounded-xl shadow-soft border border-gray-100">
+        <div class="max-w-sm mx-auto">
+            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">All Clear!</h3>
+            <p class="text-gray-500">No items are currently pending moderation review.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

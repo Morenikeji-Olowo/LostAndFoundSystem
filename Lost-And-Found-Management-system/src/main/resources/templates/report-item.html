@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Item - Veritas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .shadow-soft { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .shadow-soft-hover:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
+        .border-soft { border-color: #E5E7EB; }
+        .error-text { color: #DC2626; }
+        .error-border { border-color: #DC2626; }
+        .accent-green { color: #2D7A3E; }
+        .accent-yellow { color: #C49B2D; }
+        input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(45, 122, 62, 0.15); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen py-12">
+<div class="max-w-3xl mx-auto px-4">
+    <!-- Header -->
+    <div class="mb-8 text-center">
+        <h1 class="text-3xl font-bold text-gray-900">Report an Item</h1>
+        <p class="text-gray-500 mt-1">Help someone find what they've lost or return what you've found</p>
+    </div>
+
+    <!-- Global Error Slot -->
+    <div th:if="${#fields.hasErrors('global')}" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+        <ul>
+            <li th:each="err : ${#fields.errors('global')}" th:text="${err}">Global error message</li>
+        </ul>
+    </div>
+
+    <!-- Form -->
+    <form th:action="@{/items/report}" th:object="${reportItemRequest}" method="post" enctype="multipart/form-data" class="bg-white rounded-xl shadow-soft p-8 border border-gray-100">
+
+        <!-- Type Toggle -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Type of Report</label>
+            <div class="flex gap-4" id="typeToggle">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" th:field="*{type}" value="LOST" class="w-4 h-4 text-[#2D7A3E] focus:ring-[#2D7A3E]">
+                    <span class="text-sm font-medium">I Lost Something</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" th:field="*{type}" value="FOUND" class="w-4 h-4 text-[#C49B2D] focus:ring-[#C49B2D]">
+                    <span class="text-sm font-medium">I Found Something</span>
+                </label>
+            </div>
+            <span th:if="${#fields.hasErrors('type')}" th:errors="*{type}" class="error-text text-sm block mt-1"></span>
+        </div>
+
+        <!-- Name -->
+        <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-1">What is it? <span class="text-red-500">*</span></label>
+            <input type="text" th:field="*{name}" class="w-full rounded-lg border border-gray-200 px-4 py-2.5 focus:outline-none focus:border-[#2D7A3E] transition" placeholder="e.g., Black Backpack">
+            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-text text-sm block mt-1"></span>
+        </div>
+
+        <!-- Category -->
+        <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Category <span class="text-red-500">*</span></label>
+            <select th:field="*{category}" class="w-full rounded-lg border border-gray-200 px-4 py-2.5 focus:outline-none focus:border-[#2D7A3E] transition bg-white">
+                <option value="">Select a category</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Keys">Keys</option>
+                <option value="ID Card">ID Card</option>
+                <option value="Bag">Bag</option>
+                <option value="Books">Books</option>
+                <option value="Other">Other</option>
+            </select>
+            <span th:if="${#fields.hasErrors('category')}" th:errors="*{category}" class="error-text text-sm block mt-1"></span>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Distinct Features <span class="text-red-500">*</span></label>
+            <textarea th:field="*{description}" rows="3" class="w-full rounded-lg border border-gray-200 px-4 py-2.5 focus:outline-none focus:border-[#2D7A3E] transition resize-y" placeholder="Describe the item in detail..."></textarea>
+            <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error-text text-sm block mt-1"></span>
+        </div>
+
+        <!-- Private Details -->
+        <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Private Detail <span class="text-red-500">*</span></label>
+            <textarea th:field="*{privateDetails}" rows="2" class="w-full rounded-lg border border-gray-200 px-4 py-2.5 focus:outline-none focus:border-[#2D7A3E] transition resize-y" placeholder="A specific detail only the real owner would know (never shown publicly)"></textarea>
+            <p class="text-xs text-gray-500 mt-1">This will only be visible to you and administrators</p>
+            <span th:if="${#fields.hasErrors('privateDetails')}" th:errors="*{privateDetails}" class="error-text text-sm block mt-1"></span>
+        </div>
+
+        <!-- Location -->
+        <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Location <span class="text-red-500">*</span></label>
+            <select th:field="*{locationTag}" class="w-full rounded-lg border border-gray-200 px-4 py-2.5 focus:outline-none focus:border-[#2D7A3E] transition bg-white">
+                <option value="">Select a location</option>
+                <option value="Library">Library</option>
+                <option value="Cafeteria">Cafeteria</option>
+                <option value="Science Lab">Science Lab</option>
+                <option value="Gym">Gym</option>
+                <option value="Other">Other</option>
+            </select>
+            <span th:if="${#fields.hasErrors('locationTag')}" th:errors="*{locationTag}" class="error-text text-sm block mt-1"></span>
+        </div>
+
+        <!-- Date Reported -->
+        <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Date <span class="text-red-500">*</span></label>
+            <input type="date" th:field="*{dateReported}" class="w-full rounded-lg border border-gray-200 px-4 py-2.5 focus:outline-none focus:border-[#2D7A3E] transition">
+            <span th:if="${#fields.hasErrors('dateReported')}" th:errors="*{dateReported}" class="error-text text-sm block mt-1"></span>
+        </div>
+
+        <!-- Photo -->
+        <div class="mb-5" id="photoField">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Photo <span th:if="${reportItemRequest.type == 'FOUND'}" class="text-red-500">*</span></label>
+            <input type="file" th:field="*{photo}" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-[#2D7A3E] file:text-white hover:file:bg-[#236632] transition cursor-pointer">
+            <p class="text-xs text-gray-500 mt-1">Upload a photo of the item</p>
+            <span th:if="${#fields.hasErrors('photo')}" th:errors="*{photo}" class="error-text text-sm block mt-1"></span>
+        </div>
+
+        <!-- Guest Phone (Optional) -->
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number (Optional)</label>
+            <input type="tel" th:field="*{guestPhone}" class="w-full rounded-lg border border-gray-200 px-4 py-2.5 focus:outline-none focus:border-[#2D7A3E] transition" placeholder="+234 800 000 0000">
+            <p class="text-xs text-gray-500 mt-1">Leave blank if you're logged in</p>
+            <span th:if="${#fields.hasErrors('guestPhone')}" th:errors="*{guestPhone}" class="error-text text-sm block mt-1"></span>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex gap-3">
+            <button type="submit" id="submitBtn" class="flex-1 px-6 py-3 bg-[#2D7A3E] text-white rounded-lg font-medium hover:bg-[#236632] transition shadow-soft">
+                Report Lost Item
+            </button>
+            <a href="/items" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Toggle submit button text and photo requirement based on type
+    document.addEventListener('DOMContentLoaded', function() {
+        const typeRadios = document.querySelectorAll('input[name="type"]');
+        const submitBtn = document.getElementById('submitBtn');
+        const photoLabel = document.querySelector('#photoField label');
+
+        function updateForm() {
+            let selected = document.querySelector('input[name="type"]:checked');
+            if (selected) {
+                const type = selected.value;
+                if (type === 'LOST') {
+                    submitBtn.textContent = 'Report Lost Item';
+                    submitBtn.className = 'flex-1 px-6 py-3 bg-[#2D7A3E] text-white rounded-lg font-medium hover:bg-[#236632] transition shadow-soft';
+                    if (photoLabel) photoLabel.innerHTML = 'Photo <span class="text-gray-400 text-sm font-normal">(Optional)</span>';
+                } else if (type === 'FOUND') {
+                    submitBtn.textContent = 'Report Found Item';
+                    submitBtn.className = 'flex-1 px-6 py-3 bg-[#C49B2D] text-white rounded-lg font-medium hover:bg-[#A88225] transition shadow-soft';
+                    if (photoLabel) photoLabel.innerHTML = 'Photo <span class="text-red-500">*</span>';
+                }
+            }
+        }
+
+        typeRadios.forEach(radio => {
+            radio.addEventListener('change', updateForm);
+        });
+
+        // Initial state
+        updateForm();
+    });
+</script>
+</body>
+</html>

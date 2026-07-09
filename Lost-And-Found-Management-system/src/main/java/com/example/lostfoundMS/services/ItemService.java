@@ -1,15 +1,18 @@
 package com.example.lostfoundMS.services;
 
 import com.example.lostfoundMS.entities.Item;
+import com.example.lostfoundMS.entities.dto.ReportItemRequest;
+import com.example.lostfoundMS.entities.enums.ItemModerationStatus;
+import com.example.lostfoundMS.entities.enums.ItemStatus;
 import com.example.lostfoundMS.entities.enums.ItemType;
 import com.example.lostfoundMS.entities.User;
 import com.example.lostfoundMS.repo.ItemRepository;
 
-import com.example.lostfoundMS.repo.UserRepository;
+import com.example.lostfoundMS.utils.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -19,81 +22,69 @@ public class ItemService {
     private ItemRepository itemRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private CloudinaryService cloudinaryService;
 
-    @Autowired
-    private ImageService imageService;
-
-    public void reportLostItem(Item item, String email, MultipartFile photo){
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("User not found"));
-        item.setUser(user);
-        item.setType(ItemType.LOST);
-
-        Item savedItem = itemRepository.save(item);
-
-        try{
-            String photoPATH = imageService.saveImage(photo, savedItem.getReferenceCode());
-//            savedItem.setPhotoPath(photoPATH);
-            itemRepository.save(savedItem);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+    public ItemService(ItemRepository itemRepository, CloudinaryService cloudinaryService) {
+        this.itemRepository = itemRepository;
+        this.cloudinaryService = cloudinaryService;
     }
 
-    public void reportFoundItem(Item item, String email, MultipartFile photo){
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("User not found"));
-
-        item.setUser(user);
-        item.setType(ItemType.FOUND);
-
-        Item savedItem = itemRepository.save(item);
-        try {
-            String photoPath = imageService.saveImage(photo, savedItem.getReferenceCode());
-            savedItem.setPhotoPath(photoPath);
-            itemRepository.save(savedItem);
-        } catch (Exception e) {
-            System.out.println("Image save failed: " + e.getMessage());
+    public Item reportItem(ReportItemRequest request, User reporter) throws IOException {
+        if (request.getType() == ItemType.FOUND
+                && (request.getPhoto() == null || request.getPhoto().isEmpty())) {
+            throw new IllegalArgumentException("A photo is required when reporting a found item");
         }
 
-    }
+        Item item = new Item();
+        item.setUser(reporter);
+        item.setType(request.getType());
+        item.setName(request.getName());
+        item.setCategory(request.getCategory());
+        item.setDescription(request.getDescription());
+        item.setPrivateDetails(request.getPrivateDetails());
+        item.setLocationTag(request.getLocationTag());
+        item.setDateReported(request.getDateReported());
+        item.setGuestPhone(request.getGuestPhone());
 
-    public List<Item> getAllFoundItems(){
-        return itemRepository.findByType(ItemType.FOUND);
-    }
-    public List<Item> getAllLostItems(){
-        return itemRepository.findByType(ItemType.LOST);
-    }
-
-    public Item getItemById(Long id){
-        return itemRepository.findById(id)
-                .orElseThrow(()->new RuntimeException("Item not found"));
-    }
-
-    public List<Item> getItemsByUser(String email){
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("User not found"));
-        return itemRepository.findByUserId(user.getId());
-    }
-
-    public List<Item> searchFoundItems(String Keyword){
-        if(Keyword == null || Keyword.trim().isEmpty()){
-            return getAllFoundItems();
+        if(request.getPhoto() != null && !request.getPhoto().isEmpty()) {
+            CloudinaryService.UploadResult uploadResult = cloudinaryService.upload(request.getPhoto());
+            item.setImageUrl(uploadResult.url());
+            item.setImagePublicId(uploadResult.publicId());
         }
-        return itemRepository.searchByKeyword(ItemType.FOUND, Keyword.trim());
+
+        return itemRepository.save(item);
     }
-    public List<Item> getFoundItemsByCategory(String category){
-        return itemRepository.findByType(ItemType.FOUND)
-                .stream()
-                .filter(item -> item.getCategory().equalsIgnoreCase(category))
-                .toList();
+
+    public List<Item> getPublicBoard() {
+        return itemRepository.findByModerationStatusAndItemStatus(
+                ItemModerationStatus.APPROVED, ItemStatus.ACTIVE
+        );
     }
-    public List<Item> getAllItems() {
-        return itemRepository.findAll();
+
+    public List<Item> getPendingModeration() {
+        return itemRepository.findByModerationStatus(ItemModerationStatus.PENDING);
     }
-    public List<Item> getTop5Items(){
-        return itemRepository.getTop4Items();
+
+    public Item approveItem(Long itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Item not found"));
+        item.setModerationStatus(ItemModerationStatus.APPROVED);
+        return itemRepository.save(item);
+    }
+
+    public void rejectItem(Long itemId) throws IOException {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Item not found"));
+
+        if (item.getImagePublicId() != null) {
+            cloudinaryService.delete(item.getImagePublicId());
+        }
+
+        item.setModerationStatus(ItemModerationStatus.REJECTED);
+        itemRepository.save(item);
+    }
+
+    public List<Item> getUserItems(Long userId) {
+        return itemRepository.findByUserId(userId);
     }
 }

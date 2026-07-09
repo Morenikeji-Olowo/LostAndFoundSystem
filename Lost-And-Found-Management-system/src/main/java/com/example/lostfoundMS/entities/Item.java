@@ -119,7 +119,6 @@ public class Item {
         this.referenceCode = prefix + "-" + year + "-" + random;
     }
 
-    // ---------- Getters / setters ----------
 
     public Long getId() {
         return id;

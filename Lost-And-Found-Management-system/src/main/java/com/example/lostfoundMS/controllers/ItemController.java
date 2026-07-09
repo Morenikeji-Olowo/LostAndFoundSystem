@@ -2,77 +2,105 @@ package com.example.lostfoundMS.controllers;
 
 import com.example.lostfoundMS.entities.Item;
 import com.example.lostfoundMS.entities.User;
+import com.example.lostfoundMS.entities.dto.ReportItemRequest;
 import com.example.lostfoundMS.services.ClaimService;
 import com.example.lostfoundMS.services.ItemService;
+import com.example.lostfoundMS.services.MatchService;
 import com.example.lostfoundMS.utils.AuthUtils;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.util.List;
 
 
 @Controller
 public class ItemController {
+    private final ItemService itemService;
+    private final MatchService matchService;
 
-    @Autowired
-    private ItemService itemService;
-
-    @Autowired
-    private AuthUtils authUtils;
-
-    @Autowired
-    private ClaimService claimService;
-
-    @GetMapping("/browse")
-    public String browseItems(@RequestParam(required = false) String keyword, HttpSession session, @RequestParam(required = false) String category, Model model){
-        if(keyword != null && !keyword.isEmpty()){
-            model.addAttribute("items", itemService.searchFoundItems(keyword));
-            model.addAttribute("keyword",  keyword);
-        }
-        else if(category != null && !category.isEmpty()){
-            model.addAttribute("items", itemService.getFoundItemsByCategory(category));
-            model.addAttribute("category",  category);
-        }
-        else {
-            model.addAttribute("items", itemService.getAllItems());
-        }
-        authUtils.addAuthAttributes(session,model);
-        return "browse";
+    public ItemController(ItemService itemService, MatchService matchService) {
+        this.itemService = itemService;
+        this.matchService = matchService;
     }
 
-    @GetMapping("/item/{id}")
-    public String itemDetail(@PathVariable Long id, Model model, HttpSession session){
+    // Public bulletin board
+    @GetMapping("/items")
+    public String board(Model model) {
+        List<Item> items = itemService.getPublicBoard();
+        model.addAttribute("items", items);
+        return "items";
+    }
 
-        Item item = itemService.getItemById(id);
-        model.addAttribute("item", item);
-        authUtils.addAuthAttributes(session, model);
+    @GetMapping("/items/report")
+    public String showReportForm(Model model) {
+        model.addAttribute("reportItemRequest", new ReportItemRequest());
+        return "report-item";
+    }
 
-        if(authUtils.isLoggedIn(session)) {
-            User currentUser = authUtils.getCurrentUser(session);
-            boolean owner = item.getUser() != null &&
-                    item.getUser().getId().equals(currentUser.getId());
-            model.addAttribute("isOwner", owner);
-        } else {
-            model.addAttribute("isOwner", false);
+    @PostMapping("/items/report")
+    public String submitReport(
+            @Valid @ModelAttribute("reportItemRequest") ReportItemRequest request,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal User currentUser,
+            RedirectAttributes redirectAttributes
+    ) {
+        if (bindingResult.hasErrors()) {
+            return "report-item";
         }
 
-        // debug AFTER everything is set
-        System.out.println("=== ITEM TYPE: " + item.getType());
-        System.out.println("=== ITEM STATUS: " + item.getItemStatus());
-        System.out.println("=== IS OWNER: " + model.getAttribute("isOwner"));
-        System.out.println("=== IS LOGGED IN: " + model.getAttribute("isLoggedIn"));
+        try {
+            itemService.reportItem(request, currentUser);
+        } catch (IllegalArgumentException e) {
+            bindingResult.reject("error", e.getMessage());
+            return "report-item";
+        } catch (IOException e) {
+            bindingResult.reject("error", "Photo upload failed. Please try again.");
+            return "report-item";
+        }
 
-        return "item_detail";
+        redirectAttributes.addFlashAttribute("successMessage", "Item reported successfully.");
+        return "redirect:/items";
     }
-    @PostMapping("/claim/{itemId}")
-    public String submitClaim(@PathVariable Long itemId,
-                              @RequestParam String message, HttpSession session) {
 
-        User curentUser = authUtils.getCurrentUser(session);
-        claimService.createClaim(message, curentUser, itemId);
+    @GetMapping("/my-items")
+    public String myItems(@AuthenticationPrincipal User currentUser, Model model) {
+        model.addAttribute("items", itemService.getUserItems(currentUser.getId()));
+        return "my-items";
+    }
 
-        return "redirect:/";
+
+    // ---------- Admin moderation ----------
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/admin/moderation")
+    public String moderationQueue(Model model) {
+        model.addAttribute("items", itemService.getPendingModeration());
+        return "admin-moderation";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/admin/moderation/{id}/approve")
+    public String approve(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        Item approved = itemService.approveItem(id);
+        matchService.findMatchesFor(approved);
+        redirectAttributes.addFlashAttribute("successMessage", "Item approved and matched.");
+        return "redirect:/admin/moderation";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/admin/moderation/{id}/reject")
+    public String reject(@PathVariable Long id, RedirectAttributes redirectAttributes) throws IOException {
+        itemService.rejectItem(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Item rejected.");
+        return "redirect:/admin/moderation";
     }
 }

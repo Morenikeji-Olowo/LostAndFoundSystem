@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost & Found Bulletin - Veritas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .shadow-soft { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .shadow-soft-hover:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
+        .badge-lost { background-color: #DC2626; }
+        .badge-found { background-color: #16A34A; }
+        .accent-green { color: #2D7A3E; }
+        .accent-yellow { color: #C49B2D; }
+        .border-soft { border-color: #E5E7EB; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Lost & Found</h1>
+        <div class="flex gap-3">
+            <a href="/items/report?type=LOST" class="px-6 py-2.5 bg-[#2D7A3E] text-white rounded-lg font-medium hover:bg-[#236632] transition shadow-soft">Report Lost</a>
+            <a href="/items/report?type=FOUND" class="px-6 py-2.5 bg-[#C49B2D] text-white rounded-lg font-medium hover:bg-[#A88225] transition shadow-soft">Report Found</a>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-xl shadow-soft p-6 mb-8 border border-gray-100">
+        <form method="get" action="/items" class="flex flex-wrap items-end gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <select name="type" class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-[#2D7A3E] focus:border-transparent outline-none bg-white">
+                    <option value="">All</option>
+                    <option value="LOST">Lost</option>
+                    <option value="FOUND">Found</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select name="category" class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-[#2D7A3E] focus:border-transparent outline-none bg-white">
+                    <option value="">All Categories</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Keys">Keys</option>
+                    <option value="ID Card">ID Card</option>
+                    <option value="Bag">Bag</option>
+                    <option value="Books">Books</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <select name="location" class="rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-[#2D7A3E] focus:border-transparent outline-none bg-white">
+                    <option value="">All Locations</option>
+                    <option value="Library">Library</option>
+                    <option value="Cafeteria">Cafeteria</option>
+                    <option value="Science Lab">Science Lab</option>
+                    <option value="Gym">Gym</option>
+                </select>
+            </div>
+            <button type="submit" class="px-6 py-2 bg-gray-800 text-white rounded-lg font-medium hover:bg-gray-700 transition shadow-soft">Apply Filters</button>
+        </form>
+    </div>
+
+    <!-- Items Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div th:each="item : ${items}" class="bg-white rounded-xl shadow-soft hover:shadow-soft-hover transition-all duration-300 overflow-hidden border border-gray-100">
+            <!-- Image -->
+            <div class="h-48 bg-gray-100 relative">
+                <img th:if="${item.imageUrl}" th:src="${item.imageUrl}" alt="Item image" class="w-full h-full object-cover">
+                <div th:unless="${item.imageUrl}" class="w-full h-full flex items-center justify-center text-gray-400 bg-gray-50">
+                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+                <!-- Status Badge -->
+                <div th:if="${item.type.name() == 'FOUND'}" class="absolute top-3 right-3 px-3 py-1 bg-green-600 text-white text-xs font-semibold rounded-full shadow">FOUND</div>
+                <div th:if="${item.type.name() == 'LOST'}" class="absolute top-3 right-3 px-3 py-1 bg-red-600 text-white text-xs font-semibold rounded-full shadow">LOST</div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-5">
+                <h3 class="text-lg font-semibold text-gray-900 mb-1" th:text="${item.name}">Item Name</h3>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <span class="text-xs px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full" th:text="${item.category}">Category</span>
+                    <span class="text-xs px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full" th:text="${item.locationTag}">Location</span>
+                </div>
+                <p class="text-sm text-gray-600 line-clamp-2 mb-4" th:text="${item.description}">Description excerpt...</p>
+                <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <span class="text-xs text-gray-500" th:text="'Ref: ' + ${item.referenceCode}">Ref: ABC123</span>
+                    <a th:href="'/claims/submit?itemId=' + ${item.id}" class="text-sm font-medium text-[#2D7A3E] hover:text-[#236632] transition">Claim This →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${items == null || items.empty}" class="text-center py-16">
+        <p class="text-gray-500 text-lg">No items posted yet.</p>
+        <p class="text-gray-400 mt-2">Be the first to report a lost or found item.</p>
+    </div>
+</div>
+</body>
+</html>
