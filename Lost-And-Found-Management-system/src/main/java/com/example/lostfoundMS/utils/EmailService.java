@@ -26,4 +26,18 @@ public class EmailService {
         );
         mailSender.send(message);
     }
+
+    public void sendPasswordResetEmail(String toEmail, String token) {
+        String link = baseUrl + "/reset-password?token=" + token;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Reset your Lost & Found password");
+        message.setText(
+                "Someone requested a password reset for this account.\n\n" +
+                        "Click here to set a new password:\n" + link +
+                        "\n\nThis link expires in 1 hour. If you didn't request this, ignore this email."
+        );
+        mailSender.send(message);
+    }
 }

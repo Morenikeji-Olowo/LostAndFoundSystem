@@ -62,6 +62,8 @@ public class User implements UserDetails {
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private Timestamp lastLogin;
+    private String resetToken;
+    private Timestamp resetTokenExpiresAt;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -227,5 +229,28 @@ public class User implements UserDetails {
 
     public void setItems(List<Item> items) {
         this.items = items;
+    }
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public Timestamp getResetTokenExpiresAt() {
+        return resetTokenExpiresAt;
+    }
+
+    public void setResetTokenExpiresAt(Timestamp resetTokenExpiresAt) {
+        this.resetTokenExpiresAt = resetTokenExpiresAt;
     }
 }

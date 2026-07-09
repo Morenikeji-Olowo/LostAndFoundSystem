@@ -34,7 +34,7 @@ public class ItemService {
 
         try{
             String photoPATH = imageService.saveImage(photo, savedItem.getReferenceCode());
-            savedItem.setPhotoPath(photoPATH);
+//            savedItem.setPhotoPath(photoPATH);
             itemRepository.save(savedItem);
         }
         catch (Exception e){
