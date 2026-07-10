@@ -44,7 +44,7 @@ public class AuthController {
         }
 
         redirectAttributes.addFlashAttribute(
-                "successMessage", "Check your email to verify your account before logging in."
+                "successMessage", "Check your email (including spam/junk) to verify your account before logging in."
         );
         return "redirect:/login";
     }
@@ -76,8 +76,7 @@ public class AuthController {
     public String resendVerification(@RequestParam String email, RedirectAttributes redirectAttributes) {
         try {
             authService.resendVerificationEmail(email);
-            redirectAttributes.addFlashAttribute("successMessage", "Verification email sent. Check your inbox.");
-        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("successMessage", "Verification email sent. Check your inbox and spam folder.");        } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
         return "redirect:/login";
