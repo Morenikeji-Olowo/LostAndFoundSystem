@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<!-- Navbar Fragment -->
+<nav th:fragment="navbar" class="bg-white border-b border-gray-100 shadow-soft sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+
+            <!-- Left: Logo + Desktop Nav -->
+            <div class="flex items-center gap-8">
+                <!-- Logo -->
+                <a href="/items" class="flex items-center gap-2 text-gray-900 hover:text-[#2D7A3E] transition">
+                    <svg class="w-8 h-8 text-[#2D7A3E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 7v3m0 0v3m0-3h3m-3 0H9"/>
+                    </svg>
+                    <span class="font-bold text-lg tracking-tight hidden sm:block">
+                            Veritas
+                            <span class="font-normal text-gray-500 text-sm ml-1">Lost & Found</span>
+                        </span>
+                    <span class="font-bold text-lg tracking-tight sm:hidden">Veritas</span>
+                </a>
+
+                <!-- Desktop Navigation (hidden on mobile) -->
+                <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+                    <a href="/items" class="text-gray-700 hover:text-[#2D7A3E] transition">Browse Items</a>
+                </div>
+            </div>
+
+            <!-- Right: Desktop Actions -->
+            <div class="hidden md:flex items-center gap-4">
+                <!-- Logged Out -->
+                <div sec:authorize="!isAuthenticated()" class="flex items-center gap-3">
+                    <a href="/login" class="text-gray-700 hover:text-[#2D7A3E] transition text-sm font-medium">Log In</a>
+                    <a href="/register" class="px-4 py-2 bg-[#2D7A3E] text-white rounded-lg font-medium hover:bg-[#236632] transition shadow-soft text-sm">
+                        Register
+                    </a>
+                </div>
+
+                <!-- Logged In -->
+                <div sec:authorize="isAuthenticated()" class="flex items-center gap-4">
+                    <!-- Regular Links -->
+                    <a href="/items/report" class="text-gray-700 hover:text-[#2D7A3E] transition text-sm font-medium">Report Item</a>
+                    <a href="/my-items" class="text-gray-700 hover:text-[#2D7A3E] transition text-sm font-medium">My Items</a>
+
+                    <!-- Admin Links -->
+                    <div sec:authorize="hasRole('ADMIN')" class="flex items-center gap-2 pl-4 border-l border-gray-200">
+                        <span class="text-xs text-gray-400 font-medium uppercase tracking-wider mr-1">Admin</span>
+                        <a href="/admin/moderation" class="px-3 py-1 bg-[#C49B2D] text-white rounded-lg text-xs font-medium hover:bg-[#A88225] transition shadow-soft">
+                            Moderation
+                        </a>
+                        <a href="/admin/issues" class="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition shadow-soft">
+                            Issues
+                        </a>
+                    </div>
+
+                    <!-- User Menu Dropdown -->
+                    <div class="relative" x-data="{ open: false }" @click.away="open = false">
+                        <button @click="open = !open"
+                                class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition border border-gray-200">
+                                <span class="text-sm font-medium text-gray-700"
+                                      sec:authentication="principal.fullName">User Name</span>
+                            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div x-show="open"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 transform scale-95"
+                             x-transition:enter-end="opacity-100 transform scale-100"
+                             class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-soft border border-gray-100 py-1 z-50">
+                            <div class="px-4 py-2 border-b border-gray-100">
+                                <p class="text-sm font-medium text-gray-900"
+                                   sec:authentication="principal.fullName">User Name</p>
+                                <p class="text-xs text-gray-500"
+                                   sec:authentication="principal.email">user@example.com</p>
+                            </div>
+                            <a href="/my-items" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                My Items
+                            </a>
+                            <a href="/items/report" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                Report Item
+                            </a>
+                            <!-- Admin shortcuts in dropdown -->
+                            <div sec:authorize="hasRole('ADMIN')" class="border-t border-gray-100">
+                                <div class="px-4 py-1.5 text-xs text-gray-400 font-medium uppercase tracking-wider">Admin</div>
+                                <a href="/admin/moderation" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                    Moderation Queue
+                                </a>
+                                <a href="/admin/issues" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition">
+                                    Open Issues
+                                </a>
+                            </div>
+                            <div class="border-t border-gray-100">
+                                <!-- Logout Form - CRITICAL: Must be POST -->
+                                <form th:action="@{/logout}" method="post" class="block">
+                                    <button type="submit"
+                                            class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition font-medium">
+                                        Logout
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden flex items-center gap-2">
+                <!-- Logged Out - Mobile Quick Actions -->
+                <div sec:authorize="!isAuthenticated()" class="flex items-center gap-2">
+                    <a href="/login" class="text-sm font-medium text-gray-700 hover:text-[#2D7A3E] transition">Log In</a>
+                    <a href="/register" class="px-3 py-1.5 bg-[#2D7A3E] text-white rounded-lg text-sm font-medium hover:bg-[#236632] transition shadow-soft">
+                        Register
+                    </a>
+                </div>
+
+                <!-- Mobile Hamburger -->
+                <button id="mobileMenuToggle"
+                        class="p-2 rounded-lg hover:bg-gray-50 transition border border-gray-200"
+                        aria-label="Toggle navigation menu">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="md:hidden hidden border-t border-gray-100 py-4 space-y-3">
+            <!-- All users -->
+            <a href="/items" class="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition">Browse Items</a>
+
+            <!-- Logged Out -->
+            <div sec:authorize="!isAuthenticated()" class="space-y-2 pt-2 border-t border-gray-100">
+                <a href="/login" class="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition">Log In</a>
+                <a href="/register" class="block px-3 py-2 bg-[#2D7A3E] text-white rounded-lg font-medium hover:bg-[#236632] transition text-center">
+                    Register
+                </a>
+            </div>
+
+            <!-- Logged In -->
+            <div sec:authorize="isAuthenticated()" class="space-y-2 pt-2 border-t border-gray-100">
+                <div class="px-3 py-2">
+                    <p class="text-sm font-medium text-gray-900" sec:authentication="principal.fullName">User Name</p>
+                    <p class="text-xs text-gray-500" sec:authentication="principal.email">user@example.com</p>
+                </div>
+                <a href="/items/report" class="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition">Report Item</a>
+                <a href="/my-items" class="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition">My Items</a>
+
+                <!-- Admin Mobile Links -->
+                <div sec:authorize="hasRole('ADMIN')" class="space-y-2 pt-2 border-t border-gray-100">
+                    <p class="px-3 text-xs text-gray-400 font-medium uppercase tracking-wider">Admin</p>
+                    <a href="/admin/moderation" class="block px-3 py-2 bg-[#C49B2D] text-white rounded-lg text-sm font-medium hover:bg-[#A88225] transition">
+                        Moderation Queue
+                    </a>
+                    <a href="/admin/issues" class="block px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+                        Open Issues
+                    </a>
+                </div>
+
+                <!-- Logout Form - Mobile -->
+                <form th:action="@{/logout}" method="post" class="pt-2 border-t border-gray-100">
+                    <button type="submit"
+                            class="w-full px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition font-medium text-left">
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alpine.js for dropdown (lightweight) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+    <!-- Mobile menu toggle -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('mobileMenuToggle');
+            const menu = document.getElementById('mobileMenu');
+
+            if (toggle && menu) {
+                toggle.addEventListener('click', function() {
+                    menu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+</nav>
+
+<!-- Styles for the navbar (scoped to prevent leakage) -->
+<style>
+    /* Additional navbar-specific styles if needed */
+    nav .shadow-soft {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    /* Dropdown animation */
+    [x-cloak] { display: none !important; }
+
+    /* Smooth transitions */
+    nav * {
+        transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+
+    /* Badge styling for admin links */
+    .admin-badge {
+        background: linear-gradient(135deg, #C49B2D 0%, #A88225 100%);
+    }
+</style>
+</body>
+</html>
