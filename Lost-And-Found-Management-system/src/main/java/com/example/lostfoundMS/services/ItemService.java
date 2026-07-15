@@ -35,7 +35,7 @@ public class ItemService {
     }
 
     public long countByStatus(ItemStatus status) {
-        return itemRepository.countByStatus(status);
+        return itemRepository.countByItemStatus(status);
     }
 
     public long countByType(ItemType type) {
