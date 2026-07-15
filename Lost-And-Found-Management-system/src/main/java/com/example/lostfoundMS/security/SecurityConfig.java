@@ -18,8 +18,12 @@ public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+    @Autowired
+    private RoleBasedAuthSuccessHandler successHandler;
+
+    public SecurityConfig(CustomUserDetailsService userDetailsService, RoleBasedAuthSuccessHandler successHandler) {
         this.userDetailsService = userDetailsService;
+        this.successHandler = successHandler;
     }
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -46,7 +50,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .usernameParameter("email")
-                        .defaultSuccessUrl("/items", true)
+                        .successHandler(successHandler)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )

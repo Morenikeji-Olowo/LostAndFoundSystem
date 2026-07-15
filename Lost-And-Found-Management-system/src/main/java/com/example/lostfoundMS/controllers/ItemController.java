@@ -76,31 +76,4 @@ public class ItemController {
         model.addAttribute("items", itemService.getUserItems(currentUser.getId()));
         return "my-items";
     }
-
-
-    // ---------- Admin moderation ----------
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/admin/moderation")
-    public String moderationQueue(Model model) {
-        model.addAttribute("items", itemService.getPendingModeration());
-        return "admin-moderation";
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/admin/moderation/{id}/approve")
-    public String approve(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        Item approved = itemService.approveItem(id);
-        matchService.findMatchesFor(approved);
-        redirectAttributes.addFlashAttribute("successMessage", "Item approved and matched.");
-        return "redirect:/admin/moderation";
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/admin/moderation/{id}/reject")
-    public String reject(@PathVariable Long id, RedirectAttributes redirectAttributes) throws IOException {
-        itemService.rejectItem(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Item rejected.");
-        return "redirect:/admin/moderation";
-    }
 }

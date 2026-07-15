@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Veritas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        .shadow-soft { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .shadow-soft-hover:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.10); }
+        .border-soft { border-color: #E5E7EB; }
+        .accent-green { color: #2D7A3E; }
+        .accent-yellow { color: #C49B2D; }
+        .stat-card { transition: all 0.2s ease; }
+        .stat-card:hover { transform: translateY(-2px); }
+        .badge-pending { background: #FFF3E0; color: #E65100; }
+        .badge-active { background: #E8F5E9; color: #2E7D32; }
+        .badge-resolved { background: #E3F2FD; color: #1565C0; }
+        .badge-urgent { background: #FEE2E2; color: #DC2626; }
+        .gradient-green { background: linear-gradient(135deg, #2D7A3E 0%, #1a5c2a 100%); }
+        .gradient-yellow { background: linear-gradient(135deg, #C49B2D 0%, #A88225 100%); }
+        .gradient-blue { background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%); }
+        .gradient-red { background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); }
+        .gradient-purple { background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<!-- Navbar -->
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<!-- Main Content -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Page Header -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p class="text-gray-500 mt-1">Overview of the Lost & Found system activity</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="/admin/moderation" class="px-5 py-2.5 bg-[#C49B2D] text-white rounded-lg font-medium hover:bg-[#A88225] transition shadow-soft flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                Moderation Queue
+            </a>
+            <a href="/admin/issues" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition shadow-soft flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                Open Issues
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Items -->
+        <div class="bg-white rounded-xl shadow-soft p-6 border border-gray-100 stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Total Items</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1" th:text="${stats.totalItems != null ? stats.totalItems : 0}">0</p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-[#2D7A3E]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2 text-xs">
+                    <span class="text-gray-400">
+                        <span class="text-[#2D7A3E] font-medium" th:text="${stats.lostItems != null ? stats.lostItems : 0}">0</span> Lost
+                    </span>
+                <span class="text-gray-300">·</span>
+                <span class="text-gray-400">
+                        <span class="text-[#C49B2D] font-medium" th:text="${stats.foundItems != null ? stats.foundItems : 0}">0</span> Found
+                    </span>
+            </div>
+        </div>
+
+        <!-- Pending Moderation -->
+        <div class="bg-white rounded-xl shadow-soft p-6 border border-gray-100 stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Pending Moderation</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1" th:text="${stats.pendingModeration != null ? stats.pendingModeration : 0}">0</p>
+                </div>
+                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center text-[#C49B2D]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-3">
+                <a href="/admin/moderation" class="text-sm text-[#C49B2D] hover:text-[#A88225] font-medium transition">
+                    Review now →
+                </a>
+            </div>
+        </div>
+
+        <!-- Active Claims -->
+        <div class="bg-white rounded-xl shadow-soft p-6 border border-gray-100 stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Active Claims</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1" th:text="${stats.activeClaims != null ? stats.activeClaims : 0}">0</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-3 flex items-center gap-2 text-xs">
+                    <span class="text-gray-400">
+                        <span class="text-blue-600 font-medium" th:text="${stats.pendingClaims != null ? stats.pendingClaims : 0}">0</span> Pending review
+                    </span>
+            </div>
+        </div>
+
+        <!-- Open Issues -->
+        <div class="bg-white rounded-xl shadow-soft p-6 border border-gray-100 stat-card">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-500">Open Issues</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1" th:text="${stats.openIssues != null ? stats.openIssues : 0}">0</p>
+                </div>
+                <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center text-red-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="mt-3">
+                <a href="/admin/issues" class="text-sm text-red-600 hover:text-red-700 font-medium transition">
+                    View all →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity & Quick Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Recent Items -->
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-soft border border-gray-100 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="font-semibold text-gray-900">Recent Items</h2>
+                <a href="/admin/moderation" class="text-sm text-[#2D7A3E] hover:text-[#236632] font-medium transition">View all →</a>
+            </div>
+            <div class="divide-y divide-gray-100">
+                <div th:each="item : ${recentItems}" class="px-6 py-4 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div th:if="${item.imageUrl}" class="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
+                                <img th:src="${item.imageUrl}" alt="" class="w-full h-full object-cover">
+                            </div>
+                            <div th:unless="${item.imageUrl}" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 flex-shrink-0">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="font-medium text-gray-900 truncate" th:text="${item.name}">Item Name</p>
+                                <div class="flex items-center gap-2 text-xs">
+                                    <span th:if="${item.type.name() == 'FOUND'}" class="text-green-600 font-medium">Found</span>
+                                    <span th:if="${item.type.name() == 'LOST'}" class="text-red-600 font-medium">Lost</span>
+                                    <span class="text-gray-400">·</span>
+                                    <span class="text-gray-500 truncate" th:text="${item.category}">Category</span>
+                                    <span class="text-gray-400">·</span>
+                                    <span class="text-gray-500" th:text="${item.locationTag}">Location</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 flex-shrink-0">
+                            <span th:if="${item.moderationStatus.name() == 'PENDING'}" class="badge-pending px-2.5 py-0.5 text-xs font-semibold rounded-full">Pending</span>
+                            <span th:if="${item.moderationStatus.name() == 'APPROVED'}" class="badge-active px-2.5 py-0.5 text-xs font-semibold rounded-full">Approved</span>
+                            <span class="text-xs text-gray-400" th:text="${#temporals.format(item.dateReported, 'MMM d')}">Jan 1</span>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${recentItems == null || recentItems.empty}" class="px-6 py-8 text-center text-gray-500">
+                    <p>No items reported recently.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats & Actions -->
+        <div class="space-y-6">
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-xl shadow-soft p-6 border border-gray-100">
+                <h2 class="font-semibold text-gray-900 mb-4">Quick Actions</h2>
+                <div class="space-y-3">
+                    <a href="/admin/moderation" class="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition group">
+                        <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center text-[#C49B2D] group-hover:bg-yellow-200 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900">Review Moderation Queue</p>
+                            <p class="text-xs text-gray-500" th:text="'Items pending: ' + (stats.pendingModeration != null ? stats.pendingModeration : 0)">Items pending: 0</p>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                    <a href="/admin/issues" class="flex items-center gap-3 p-3 bg-red-50 rounded-lg hover:bg-red-100 transition group">
+                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center text-red-600 group-hover:bg-red-200 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900">View Open Issues</p>
+                            <p class="text-xs text-gray-500" th:text="'Issues needing attention: ' + (stats.openIssues != null ? stats.openIssues : 0)">Issues needing attention: 0</p>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-400 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="bg-white rounded-xl shadow-soft p-6 border border-gray-100">
+                <h2 class="font-semibold text-gray-900 mb-3">System Status</h2>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Total Users</span>
+                        <span class="font-medium text-gray-900" th:text="${stats.totalUsers != null ? stats.totalUsers : 0}">0</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Total Claims</span>
+                        <span class="font-medium text-gray-900" th:text="${stats.totalClaims != null ? stats.totalClaims : 0}">0</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Items Resolved</span>
+                        <span class="font-medium text-gray-900" th:text="${stats.resolvedItems != null ? stats.resolvedItems : 0}">0</span>
+                    </div>
+                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <span class="text-sm text-gray-600">Success Rate</span>
+                        <span class="font-medium text-[#2D7A3E]" th:text="${stats.successRate != null ? stats.successRate + '%' : '0%'}">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-8 pt-6 border-t border-gray-200 text-center">
+        <p class="text-xs text-gray-400">
+            &copy; 2026 Veritas Lost & Found System ·
+            <span sec:authentication="principal.fullName">Admin</span>
+            <span class="text-gray-300">·</span>
+            <span class="text-[#2D7A3E] font-medium">●</span> System Operational
+        </p>
+    </div>
+</div>
+</body>
+</html>
