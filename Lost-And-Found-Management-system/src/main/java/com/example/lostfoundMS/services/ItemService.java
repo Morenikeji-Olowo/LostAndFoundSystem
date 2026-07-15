@@ -7,9 +7,11 @@ import com.example.lostfoundMS.entities.enums.ItemStatus;
 import com.example.lostfoundMS.entities.enums.ItemType;
 import com.example.lostfoundMS.entities.User;
 import com.example.lostfoundMS.repo.ItemRepository;
-
 import com.example.lostfoundMS.utils.CloudinaryService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,16 +20,40 @@ import java.util.List;
 @Service
 public class ItemService {
 
-    @Autowired
-    private ItemRepository itemRepository;
-
-    @Autowired
-    private CloudinaryService cloudinaryService;
+    private final ItemRepository itemRepository;
+    private final CloudinaryService cloudinaryService;
 
     public ItemService(ItemRepository itemRepository, CloudinaryService cloudinaryService) {
         this.itemRepository = itemRepository;
         this.cloudinaryService = cloudinaryService;
     }
+
+    // --- Admin Stats and Dashboard Query Additions ---
+
+    public long countAll() {
+        return itemRepository.count();
+    }
+
+    public long countByStatus(ItemStatus status) {
+        return itemRepository.countByStatus(status);
+    }
+
+    public long countByType(ItemType type) {
+        return itemRepository.countByType(type);
+    }
+
+    public long countByModerationStatus(ItemModerationStatus status) {
+        return itemRepository.countByModerationStatus(status);
+    }
+
+    public List<Item> findRecent(int limit) {
+        // Fetches the most recently reported items sorted descending
+        return itemRepository.findAll(
+                PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "dateReported"))
+        ).getContent();
+    }
+
+    // --- Original Services ---
 
     public Item reportItem(ReportItemRequest request, User reporter) throws IOException {
         if (request.getType() == ItemType.FOUND

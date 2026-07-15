@@ -21,4 +21,6 @@ public interface ClaimRepository extends JpaRepository<Claim, Long> {
 
     // Guard against duplicate claims: same person claiming the same item twice
     boolean existsByItemIdAndClaimantId(Long itemId, Long claimantId);
+
+    long countByStatus(ClaimStatus status);
 }

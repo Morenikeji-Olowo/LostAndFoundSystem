@@ -23,6 +23,14 @@ public class IssueService {
         this.claimRepository = claimRepository;
     }
 
+    // --- Admin Stats Addition ---
+
+    public long countByStatus(IssueStatus status) {
+        return issueRepository.countByStatus(status);
+    }
+
+    // --- Original Services ---
+
     public Issue raiseIssue(RaiseIssueRequest request, User raisedBy) {
         Claim claim = claimRepository.findById(request.getClaimId())
                 .orElseThrow(() -> new IllegalArgumentException("Claim not found"));

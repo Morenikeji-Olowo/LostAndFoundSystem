@@ -8,8 +8,6 @@ import com.example.lostfoundMS.entities.enums.ItemStatus;
 import com.example.lostfoundMS.entities.enums.Role;
 import com.example.lostfoundMS.repo.ClaimRepository;
 import com.example.lostfoundMS.repo.ItemRepository;
-import com.example.lostfoundMS.repo.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +21,23 @@ public class ClaimService {
         this.claimRepository = claimRepository;
         this.itemRepository = itemRepository;
     }
+
+    // --- Admin Stats Additions ---
+
+    public long countAll() {
+        return claimRepository.count();
+    }
+
+    public long countActive() {
+        // Active means claims that have not been settled (Rejected/Approved)
+        return claimRepository.countByStatus(ClaimStatus.PENDING);
+    }
+
+    public long countByStatus(ClaimStatus status) {
+        return claimRepository.countByStatus(status);
+    }
+
+    // --- Original Services ---
 
     public Claim submitClaim(SubmitClaimRequest request, User claimant) {
         Item item = itemRepository.findById(request.getItemId())
