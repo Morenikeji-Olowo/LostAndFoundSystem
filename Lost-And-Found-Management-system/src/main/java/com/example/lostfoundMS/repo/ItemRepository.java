@@ -35,7 +35,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     // Auto-archive job: active items older than a cutoff date
     List<Item> findByItemStatusAndDateReportedBefore(ItemStatus itemStatus, LocalDate cutoff);
 
-    long countByStatus(ItemStatus status);
+    long countByItemStatus(ItemStatus status);
     long countByType(ItemType type);
     long countByModerationStatus(ItemModerationStatus status);
 }
