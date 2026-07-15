@@ -20,7 +20,7 @@ public class RoleBasedAuthSuccessHandler implements AuthenticationSuccessHandler
         String redirectUrl = switch (user.getRole()){
             case ADMIN -> "/admin/dashboard";
             case SECURITY_OFFICE -> "/security-office/dashboard";
-            case STUDENT -> "/home";
+            case STUDENT -> "/items";
         };
 
         response.sendRedirect(redirectUrl);
