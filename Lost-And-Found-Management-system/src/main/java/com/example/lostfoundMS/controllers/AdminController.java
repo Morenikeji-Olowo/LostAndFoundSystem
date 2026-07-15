@@ -34,7 +34,7 @@ public class AdminController {
         this.claimService = claimService;
     }
 
-    @GetMapping("/dashboard")
+    @GetMapping("/admin/dashboard")
     public String dashboard(Model model) {
         Map<String, Object> stats = new HashMap<>();
 
